@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace Citoyen — STARFLEX</title>
+<meta name="description" content="L'espace citoyen STARFLEX : profil, points, certificat et notifications. Ouverture prochaine.">
+<meta property="og:title" content="Espace Citoyen — STARFLEX">
+<meta property="og:description" content="L'espace citoyen STARFLEX : profil, points, certificat et notifications. Ouverture prochaine.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/starflex.css">
+<link rel="icon" href="assets/starflex-logo.png">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html"><img src="assets/starflex-logo.png" alt="STARFLEX"></a>
+    <button class="burger" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html" class="active">Accueil</a>
+      <a href="about.html">&Agrave; propos</a>
+      <a href="one-for-seven.html">One For Seven</a>
+      <a href="civic-engagement.html">Engagement Civique</a>
+      <a href="resources.html">Ressources</a>
+      <a href="contact.html">Contact</a>
+      <a href="portal.html" class="nav-cta">Espace Citoyen</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>Espace Citoyen</h1>
+    <p>Inscription, tableau de bord et Certificat National de Participation Citoyenne.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Espace Citoyen</div>
+      <h2>Votre espace personnel arrive bientôt</h2>
+      <p>L'inscription citoyenne, le tableau de bord personnel et le Certificat National de Participation Citoyenne sont en cours de développement (Phase 2).</p>
+    </div>
+    <div class="grid grid-4">
+      <div class="card"><div class="ico">👤</div><h3>Mon Profil</h3><p>Vos informations personnelles et votre parcours citoyen.</p></div>
+      <div class="card orange"><div class="ico">🏅</div><h3>Mes Points</h3><p>Vos points d'engagement et vos distinctions.</p></div>
+      <div class="card"><div class="ico">📜</div><h3>Mon Certificat</h3><p>Votre Certificat National de Participation Citoyenne.</p></div>
+      <div class="card orange"><div class="ico">🔔</div><h3>Notifications</h3><p>Rappels électoraux et nouvelles consultations.</p></div>
+    </div>
+    <div class="center mt-24">
+      <p style="color:var(--muted);margin-bottom:18px">Laissez-nous votre email pour être prévenu dès l'ouverture des inscriptions.</p>
+      <form style="max-width:420px;margin:0 auto" onsubmit="event.preventDefault();document.getElementById('nOk').style.display='block';this.reset();">
+        <div class="field"><input type="email" required placeholder="votre@email.com"></div>
+        <button class="btn btn-orange" style="width:100%" type="submit">Me prévenir au lancement</button>
+        <div id="nOk" style="display:none;margin-top:12px;color:#0f9d55;font-weight:700">✓ Merci ! Nous vous préviendrons.</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="logo-foot"><img src="assets/starflex-logo.png" alt="STARFLEX"></div>
+        <p class="tag">Des id&eacute;es pour transformer et d&eacute;velopper les g&eacute;n&eacute;rations futures.</p>
+      </div>
+      <div>
+        <h4>Plateforme</h4>
+        <a href="about.html">&Agrave; propos</a>
+        <a href="one-for-seven.html">One For Seven</a>
+        <a href="civic-engagement.html">Engagement Civique</a>
+        <a href="portal.html">Espace Citoyen</a>
+      </div>
+      <div>
+        <h4>Ressources</h4>
+        <a href="resources.html">Actualit&eacute;s</a>
+        <a href="resources.html#faq">Questions fr&eacute;quentes</a>
+        <a href="resources.html#events">&Eacute;v&eacute;nements</a>
+        <a href="resources.html#downloads">T&eacute;l&eacute;chargements</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <a href="contact.html">Nous &eacute;crire</a>
+        <a href="contact.html#whatsapp">WhatsApp</a>
+        <a href="https://myplopplop.com" target="_blank">MyPlopPlop</a>
+        <a href="https://haitibiznis.com" target="_blank">HaitiBiznis</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 STARFLEX. Tous droits r&eacute;serv&eacute;s.</span>
+      <span class="powered">Powered by <b>HaitiBiznis Technologies</b></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

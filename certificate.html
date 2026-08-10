@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vérifier un certificat — STARFLEX</title>
+<meta name="description" content="Vérifiez l'authenticité d'un Certificat National de Participation Citoyenne STARFLEX à partir de son code.">
+<meta property="og:title" content="Vérifier un certificat citoyen — STARFLEX">
+<meta property="og:description" content="Chaque Certificat National de Participation Citoyenne est vérifiable publiquement.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/starflex.css">
+<link rel="stylesheet" href="assets/starflex-portal.css">
+<link rel="icon" href="assets/starflex-logo.png">
+<style>
+/* A certificate that prints cleanly on a single page. */
+@media print{
+  .site-header,.site-footer,.no-print{display:none!important}
+  .auth-wrap{background:#fff;padding:0}
+  .auth-card{box-shadow:none;border:0;max-width:none}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html"><img src="assets/starflex-logo.png" alt="STARFLEX"></a>
+    <button class="burger" onclick="sfToggleNav()" aria-label="Menu">&#9776;</button>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html">Accueil</a>
+      <a href="about.html">&Agrave; propos</a>
+      <a href="one-for-seven.html">One For Seven</a>
+      <a href="civic-engagement.html">Engagement Civique</a>
+      <a href="resources.html">Ressources</a>
+      <a href="contact.html">Contact</a>
+      <a href="portal.html" class="nav-cta">Espace Citoyen</a>
+    </nav>
+  </div>
+</header>
+
+<div class="auth-wrap">
+  <div class="auth-card wide">
+    <div class="auth-head no-print">
+      <img src="assets/starflex-logo.png" alt="STARFLEX">
+      <h1>Vérifier un certificat</h1>
+      <p>Chaque Certificat National de Participation Citoyenne porte un code unique, vérifiable par toute institution ou employeur.</p>
+    </div>
+
+    <form id="vForm" class="no-print">
+      <div class="field">
+        <label for="code">Code du certificat</label>
+        <input type="text" id="code" placeholder="Ex. SF-00001-TQP1I" autocapitalize="characters" spellcheck="false">
+      </div>
+      <button class="btn btn-blue btn-full" type="submit" id="submitBtn">Vérifier</button>
+    </form>
+
+    <div class="form-msg no-print" id="msg" style="margin-top:16px"></div>
+    <div id="result" style="margin-top:20px"></div>
+  </div>
+</div>
+
+<script src="assets/starflex-app.js"></script>
+<script>
+function verify(code) {
+  sfMsg('msg', '');
+  document.getElementById('result').innerHTML = '';
+  var btn = document.getElementById('submitBtn');
+  sfBusy(btn, true, 'Vérification…');
+
+  sfApi('/api/civic/certificate/verify/' + encodeURIComponent(code))
+    .then(function (r) {
+      sfBusy(btn, false);
+      var c = r.data;
+      document.getElementById('result').innerHTML =
+        '<div class="cert">' +
+          '<div class="seal">' + (c.valid ? '🏅' : '⛔') + '</div>' +
+          '<div style="font-size:13px;letter-spacing:1.6px;text-transform:uppercase;font-weight:800;color:' +
+            (c.valid ? '#0f7a43' : '#b3261e') + ';margin-bottom:10px">' +
+            (c.valid ? '✓ Certificat authentique' : 'Certificat révoqué') + '</div>' +
+          '<h3>' + sfEsc(c.holder) + '</h3>' +
+          '<div class="lvl">Niveau ' + sfEsc(c.level) + '</div>' +
+          '<div class="code">' + sfEsc(c.code) + '</div>' +
+          '<p>' + (c.department ? 'Département : ' + sfEsc(c.department) + ' · ' : '') +
+            'Délivré le ' + sfDate(c.issued_at) + '</p>' +
+          '<p style="margin-top:12px;font-size:13px">Certificat National de Participation Citoyenne — STARFLEX</p>' +
+          '<div class="no-print" style="margin-top:16px"><button class="btn btn-outline btn-sm" onclick="window.print()">Imprimer</button></div>' +
+        '</div>';
+    })
+    .catch(function (err) {
+      sfBusy(btn, false);
+      sfMsg('msg', err.status === 404
+        ? 'Aucun certificat ne correspond à ce code. Vérifiez la saisie.'
+        : err.message);
+    });
+}
+
+document.getElementById('vForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var code = document.getElementById('code').value.trim().toUpperCase();
+  if (!code) return sfMsg('msg', 'Saisissez un code de certificat.');
+  verify(code);
+});
+
+// Support certificate.html?code=SF-XXXXX-XXXXX for shared links and QR codes.
+var m = location.search.match(/[?&]code=([^&]+)/);
+if (m) {
+  var code = decodeURIComponent(m[1]).trim().toUpperCase();
+  document.getElementById('code').value = code;
+  verify(code);
+}
+</script>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-bottom" style="border-top:0;padding-top:0">
+      <span>&copy; 2026 STARFLEX. Tous droits r&eacute;serv&eacute;s.</span>
+      <span class="powered">Powered by <b>HaitiBiznis Technologies</b></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vérification du compte — STARFLEX</title>
+<meta name="description" content="Saisissez le code de vérification à 6 chiffres pour activer votre compte citoyen STARFLEX.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/starflex.css">
+<link rel="stylesheet" href="assets/starflex-portal.css">
+<link rel="icon" href="assets/starflex-logo.png">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html"><img src="assets/starflex-logo.png" alt="STARFLEX"></a>
+    <button class="burger" onclick="sfToggleNav()" aria-label="Menu">&#9776;</button>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html">Accueil</a>
+      <a href="about.html">&Agrave; propos</a>
+      <a href="one-for-seven.html">One For Seven</a>
+      <a href="civic-engagement.html">Engagement Civique</a>
+      <a href="resources.html">Ressources</a>
+      <a href="contact.html">Contact</a>
+      <a href="login.html" class="nav-cta">Se connecter</a>
+    </nav>
+  </div>
+</header>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-head">
+      <img src="assets/starflex-logo.png" alt="STARFLEX">
+      <h1>Vérifiez votre compte</h1>
+      <p id="sentTo">Saisissez le code à 6 chiffres que nous venons de vous envoyer.</p>
+    </div>
+
+    <!-- Shown only while no SMS/email provider is connected, so the flow stays testable. -->
+    <div class="demo-code" id="demoCode" style="display:none">
+      Code de vérification (mode démonstration)
+      <b id="demoCodeVal"></b>
+    </div>
+
+    <div class="form-msg" id="msg"></div>
+
+    <form id="otpForm">
+      <div class="otp-row" id="otpRow">
+        <input type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Chiffre 1">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Chiffre 2">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Chiffre 3">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Chiffre 4">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Chiffre 5">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Chiffre 6">
+      </div>
+      <button class="btn btn-orange btn-full" type="submit" id="submitBtn">Vérifier mon compte</button>
+    </form>
+
+    <div class="auth-alt">
+      Vous n'avez rien reçu ? <a href="#" id="resendLink">Renvoyer le code</a><br>
+      <span style="font-size:13.5px">Le code expire au bout de 10 minutes.</span>
+    </div>
+  </div>
+</div>
+
+<script src="assets/starflex-app.js"></script>
+<script>
+var pending = null;
+try { pending = JSON.parse(sessionStorage.getItem('sf_pending') || 'null'); } catch (e) {}
+
+if (!pending || !pending.citizen_id) {
+  // Nothing to verify — send the visitor back to where the flow starts.
+  location.href = 'register.html';
+}
+
+if (pending) {
+  var where = pending.channel === 'email' ? 'par email' : 'par SMS';
+  document.getElementById('sentTo').textContent =
+    'Nous avons envoyé un code à 6 chiffres ' + where +
+    (pending.contact ? ' à ' + pending.contact : '') + '.';
+  showDemoCode(pending.otp);
+}
+
+function showDemoCode(code) {
+  if (!code) return;
+  document.getElementById('demoCodeVal').textContent = code;
+  document.getElementById('demoCode').style.display = 'block';
+}
+
+// 6 single-character boxes that behave like one field.
+var boxes = Array.prototype.slice.call(document.querySelectorAll('#otpRow input'));
+boxes.forEach(function (b, i) {
+  b.addEventListener('input', function () {
+    b.value = b.value.replace(/\D/g, '');
+    if (b.value && i < boxes.length - 1) boxes[i + 1].focus();
+  });
+  b.addEventListener('keydown', function (e) {
+    if (e.key === 'Backspace' && !b.value && i > 0) boxes[i - 1].focus();
+  });
+  b.addEventListener('paste', function (e) {
+    var text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+    if (!text) return;
+    e.preventDefault();
+    text.split('').forEach(function (ch, k) { if (boxes[k]) boxes[k].value = ch; });
+    boxes[Math.min(text.length, 5)].focus();
+  });
+});
+boxes[0].focus();
+
+document.getElementById('otpForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var code = boxes.map(function (b) { return b.value; }).join('');
+  if (code.length !== 6) return sfMsg('msg', 'Saisissez les 6 chiffres du code.');
+
+  var btn = document.getElementById('submitBtn');
+  sfMsg('msg', '');
+  sfBusy(btn, true, 'Vérification…');
+
+  sfApi('/api/auth/verify-otp', { method: 'POST', body: { citizen_id: pending.citizen_id, code: code } })
+    .then(function (res) {
+      sfSetSession(res.token, res.data);
+      sessionStorage.removeItem('sf_pending');
+      location.href = 'dashboard.html?welcome=1';
+    })
+    .catch(function (err) {
+      sfBusy(btn, false);
+      sfMsg('msg', err.message);
+      boxes.forEach(function (b) { b.value = ''; });
+      boxes[0].focus();
+    });
+});
+
+document.getElementById('resendLink').addEventListener('click', function (e) {
+  e.preventDefault();
+  sfMsg('msg', '');
+  sfApi('/api/auth/resend-otp', { method: 'POST', body: { citizen_id: pending.citizen_id } })
+    .then(function (res) {
+      sfMsg('msg', 'Un nouveau code vient d\'être envoyé.', 'ok');
+      showDemoCode((res.data || {}).otp);
+    })
+    .catch(function (err) { sfMsg('msg', err.message); });
+});
+</script>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-bottom" style="border-top:0;padding-top:0">
+      <span>&copy; 2026 STARFLEX. Tous droits r&eacute;serv&eacute;s.</span>
+      <span class="powered">Powered by <b>HaitiBiznis Technologies</b></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

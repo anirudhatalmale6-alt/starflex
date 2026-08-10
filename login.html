@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Se connecter — STARFLEX</title>
+<meta name="description" content="Connectez-vous à votre espace citoyen STARFLEX : points, certificat, consultations et notifications.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/starflex.css">
+<link rel="stylesheet" href="assets/starflex-portal.css">
+<link rel="icon" href="assets/starflex-logo.png">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html"><img src="assets/starflex-logo.png" alt="STARFLEX"></a>
+    <button class="burger" onclick="sfToggleNav()" aria-label="Menu">&#9776;</button>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html">Accueil</a>
+      <a href="about.html">&Agrave; propos</a>
+      <a href="one-for-seven.html">One For Seven</a>
+      <a href="civic-engagement.html">Engagement Civique</a>
+      <a href="resources.html">Ressources</a>
+      <a href="contact.html">Contact</a>
+      <a href="register.html" class="nav-cta">Créer un compte</a>
+    </nav>
+  </div>
+</header>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-head">
+      <img src="assets/starflex-logo.png" alt="STARFLEX">
+      <h1>Espace Citoyen</h1>
+      <p>Connectez-vous pour retrouver vos points, votre certificat et vos consultations.</p>
+    </div>
+
+    <div class="form-msg" id="msg"></div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="identifier">Email ou téléphone</label>
+        <input type="text" id="identifier" required autocomplete="username" placeholder="votre@email.com ou +509 ...">
+      </div>
+      <div class="field">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" required autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button class="btn btn-blue btn-full" type="submit" id="submitBtn">Se connecter</button>
+    </form>
+
+    <div class="auth-alt">
+      Pas encore de compte ? <a href="register.html">Créer mon compte citoyen</a>
+    </div>
+  </div>
+</div>
+
+<script src="assets/starflex-app.js"></script>
+<script>
+if (sfToken()) location.href = 'dashboard.html';
+
+function nextPage() {
+  var m = location.search.match(/[?&]next=([^&]+)/);
+  var page = m ? decodeURIComponent(m[1]) : 'dashboard.html';
+  // Only allow same-folder pages — never an arbitrary redirect target.
+  return /^[a-z0-9_-]+\.html$/i.test(page) ? page : 'dashboard.html';
+}
+
+document.getElementById('loginForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var btn = document.getElementById('submitBtn');
+  sfMsg('msg', '');
+  sfBusy(btn, true, 'Connexion…');
+
+  sfApi('/api/auth/login', {
+    method: 'POST',
+    body: {
+      identifier: document.getElementById('identifier').value.trim(),
+      password: document.getElementById('password').value
+    }
+  })
+    .then(function (res) {
+      sfSetSession(res.token, res.data);
+      location.href = nextPage();
+    })
+    .catch(function (err) {
+      sfBusy(btn, false);
+      // An unverified account gets bounced to the code screen instead of an error.
+      var d = (err.data || {});
+      if (d.code === 'verification_required' && d.data) {
+        sessionStorage.setItem('sf_pending', JSON.stringify({
+          citizen_id: d.data.citizen_id, channel: d.data.channel, otp: d.data.otp || null,
+          contact: document.getElementById('identifier').value.trim()
+        }));
+        location.href = 'verify.html';
+        return;
+      }
+      sfMsg('msg', err.message);
+    });
+});
+</script>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-bottom" style="border-top:0;padding-top:0">
+      <span>&copy; 2026 STARFLEX. Tous droits r&eacute;serv&eacute;s.</span>
+      <span class="powered">Powered by <b>HaitiBiznis Technologies</b></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

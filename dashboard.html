@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon espace citoyen — STARFLEX</title>
+<meta name="description" content="Votre tableau de bord STARFLEX : points d'engagement, formations civiques, consultations publiques, volontariat et certificat national.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/starflex.css">
+<link rel="stylesheet" href="assets/starflex-portal.css">
+<link rel="icon" href="assets/starflex-logo.png">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="index.html"><img src="assets/starflex-logo.png" alt="STARFLEX"></a>
+    <button class="burger" onclick="sfToggleNav()" aria-label="Menu">&#9776;</button>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html">Accueil</a>
+      <a href="one-for-seven.html">One For Seven</a>
+      <a href="civic-engagement.html">Engagement Civique</a>
+      <a href="resources.html">Ressources</a>
+      <a href="dashboard.html" class="active">Mon espace</a>
+      <a href="#" onclick="event.preventDefault();sfLogout()" class="nav-cta" style="background:#eef1f6!important;color:var(--blue-ink)!important">Déconnexion</a>
+    </nav>
+  </div>
+</header>
+
+<div class="dash">
+  <div class="wrap">
+
+    <!-- Summary -->
+    <div class="dash-top">
+      <div class="dash-hi">
+        <span class="eyebrow">Espace Citoyen</span>
+        <h1 id="greeting">Bonjour</h1>
+        <p id="greetSub">Chargement de votre parcours citoyen…</p>
+      </div>
+      <div class="ring">
+        <svg width="132" height="132" viewBox="0 0 132 132">
+          <circle cx="66" cy="66" r="58" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="11"></circle>
+          <circle id="ringArc" cx="66" cy="66" r="58" fill="none" stroke="#e8963a" stroke-width="11"
+                  stroke-linecap="round" stroke-dasharray="364" stroke-dashoffset="364"
+                  style="transition:stroke-dashoffset .8s ease"></circle>
+        </svg>
+        <div class="val"><b id="ptsVal">0</b><span>points</span></div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="ico">📚</div><b id="sModules">–</b><span>Formations terminées</span></div>
+      <div class="stat"><div class="ico">🗳️</div><b id="sConsult">–</b><span>Consultations</span></div>
+      <div class="stat"><div class="ico">🤝</div><b id="sVol">–</b><span>Engagements bénévoles</span></div>
+      <div class="stat"><div class="ico">🔔</div><b id="sNotif">–</b><span>Notifications non lues</span></div>
+    </div>
+
+    <!-- Certificate -->
+    <div class="panel" id="certPanel">
+      <div class="panel-head">
+        <div>
+          <h2>Certificat National de Participation Citoyenne</h2>
+          <p>Délivré automatiquement dès 30 points, et vérifiable publiquement.</p>
+        </div>
+      </div>
+      <div id="certBody"><div class="skeleton"></div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" id="tabs">
+      <button class="on" data-tab="modules">Formations</button>
+      <button data-tab="consultations">Consultations</button>
+      <button data-tab="volunteer">Volontariat</button>
+      <button data-tab="notifications">Notifications</button>
+      <button data-tab="profile">Mon profil</button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 id="tabTitle">Formations civiques</h2>
+          <p id="tabSub">Comprendre vos droits, vos devoirs et le fonctionnement des institutions.</p>
+        </div>
+        <div id="tabAction"></div>
+      </div>
+      <div id="tabBody"><div class="skeleton"></div></div>
+    </div>
+
+    <!-- Recent activity -->
+    <div class="panel">
+      <div class="panel-head"><div><h2>Activité récente</h2><p>Chaque point est enregistré et traçable.</p></div></div>
+      <div id="activity"><div class="skeleton" style="height:52px"></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h2 id="mTitle"></h2>
+    <div class="sub" id="mSub"></div>
+    <div class="modal-body" id="mBody"></div>
+    <div class="modal-actions" id="mActions"></div>
+  </div>
+</div>
+
+<script src="assets/starflex-app.js"></script>
+<script>
+if (sfRequireAuth()) {
+
+var me = sfUser() || {};
+var dash = null;
+
+/* ── Overview ───────────────────────────────────────────────────────────── */
+function firstName(n) { return String(n || '').trim().split(' ')[0] || 'citoyen'; }
+
+function paintOverview(d) {
+  dash = d;
+  document.getElementById('greeting').textContent = 'Bonjour, ' + firstName(me.full_name);
+
+  var next = sfNextLevel(d.points);
+  document.getElementById('greetSub').textContent = next
+    ? 'Encore ' + next.need + ' point' + (next.need > 1 ? 's' : '') + ' pour atteindre le niveau ' + next.label + '.'
+    : 'Félicitations — vous avez atteint le niveau Or, le plus haut niveau d\'engagement citoyen.';
+
+  document.getElementById('ptsVal').textContent = d.points;
+  document.getElementById('sModules').textContent = d.modules_completed;
+  document.getElementById('sConsult').textContent = d.consultations_answered;
+  document.getElementById('sVol').textContent = d.volunteer_signups;
+  document.getElementById('sNotif').textContent = d.unread_notifications;
+
+  // The ring fills toward the next level (or is full at Or).
+  var target = next ? next.target : 150;
+  var pct = Math.max(0, Math.min(1, d.points / target));
+  document.getElementById('ringArc').style.strokeDashoffset = String(364 - 364 * pct);
+
+  paintCert(d);
+  paintActivity(d.recent_activity || []);
+}
+
+function paintCert(d) {
+  var box = document.getElementById('certBody');
+  if (d.certificate) {
+    var c = d.certificate;
+    box.innerHTML =
+      '<div class="cert">' +
+        '<div class="seal">🏅</div>' +
+        '<h3>' + sfEsc(me.full_name) + '</h3>' +
+        '<div class="lvl">Niveau ' + sfEsc(c.level) + '</div>' +
+        '<div class="code">' + sfEsc(c.code) + '</div>' +
+        '<p>Délivré le ' + sfDate(c.issued_at) + ' · ' + c.points_at_issue + ' points</p>' +
+        '<div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
+          '<a class="btn btn-blue btn-sm" href="certificate.html?code=' + encodeURIComponent(c.code) + '">Voir / vérifier</a>' +
+          '<button class="btn btn-outline btn-sm" onclick="shareCert(\'' + sfEsc(c.code) + '\')">Partager</button>' +
+        '</div>' +
+      '</div>';
+  } else {
+    var need = 30 - d.points;
+    box.innerHTML =
+      '<div class="cert-locked">' +
+        '<div class="seal">🔒</div>' +
+        '<h3 style="font-family:var(--font-head);color:var(--blue-ink);margin-bottom:8px">Votre certificat vous attend</h3>' +
+        '<p style="color:var(--muted);font-size:14.6px">Il vous reste <b>' + Math.max(0, need) + ' point' + (need > 1 ? 's' : '') + '</b> avant l\'obtention du certificat Bronze.</p>' +
+        '<div class="progress"><i style="width:' + Math.min(100, (d.points / 30) * 100) + '%"></i></div>' +
+        '<p style="color:var(--muted);font-size:13.5px">' + d.points + ' / 30 points</p>' +
+      '</div>';
+  }
+}
+
+function shareCert(code) {
+  var url = location.href.replace(/dashboard\.html.*$/, '') + 'certificate.html?code=' + encodeURIComponent(code);
+  var text = 'Mon Certificat National de Participation Citoyenne STARFLEX : ' + code;
+  if (navigator.share) { navigator.share({ title: 'STARFLEX', text: text, url: url }).catch(function () {}); }
+  else if (navigator.clipboard) { navigator.clipboard.writeText(url); alert('Lien copié : ' + url); }
+  else { prompt('Copiez le lien :', url); }
+}
+
+function paintActivity(list) {
+  var box = document.getElementById('activity');
+  if (!list.length) {
+    box.innerHTML = '<div class="empty"><div class="ico">🌱</div>Votre parcours commence. Terminez une formation pour gagner vos premiers points.</div>';
+    return;
+  }
+  box.innerHTML = list.map(function (a) {
+    return '<div class="note">' +
+      '<div class="dot" style="background:var(--orange)"></div>' +
+      '<div><h4>+' + a.points + ' points — ' + sfEsc(a.reason) + '</h4>' +
+      '<time>' + sfDate(a.created_at) + '</time></div></div>';
+  }).join('');
+}
+
+function reloadDashboard() {
+  return sfApi('/api/civic/dashboard').then(function (r) { paintOverview(r.data); });
+}
+
+/* ── Tabs ───────────────────────────────────────────────────────────────── */
+var TAB_META = {
+  modules:       { title: 'Formations civiques', sub: 'Comprendre vos droits, vos devoirs et le fonctionnement des institutions.' },
+  consultations: { title: 'Consultations publiques', sub: 'Donnez votre avis sur les décisions qui concernent votre communauté.' },
+  volunteer:     { title: 'Volontariat citoyen', sub: 'Passez à l\'action près de chez vous.' },
+  notifications: { title: 'Notifications', sub: 'Rappels électoraux, nouvelles consultations et annonces.' },
+  profile:       { title: 'Mon profil', sub: 'Vos informations personnelles et votre commune.' }
+};
+var current = 'modules';
+
+document.getElementById('tabs').addEventListener('click', function (e) {
+  var b = e.target.closest('button[data-tab]');
+  if (!b) return;
+  Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.classList.remove('on'); });
+  b.classList.add('on');
+  loadTab(b.dataset.tab);
+});
+
+function loadTab(tab) {
+  current = tab;
+  document.getElementById('tabTitle').textContent = TAB_META[tab].title;
+  document.getElementById('tabSub').textContent = TAB_META[tab].sub;
+  document.getElementById('tabAction').innerHTML = '';
+  document.getElementById('tabBody').innerHTML = '<div class="skeleton"></div>';
+
+  if (tab === 'modules') return loadModules();
+  if (tab === 'consultations') return loadConsultations();
+  if (tab === 'volunteer') return loadVolunteer();
+  if (tab === 'notifications') return loadNotifications();
+  if (tab === 'profile') return loadProfile();
+}
+
+function tabError(err) {
+  document.getElementById('tabBody').innerHTML =
+    '<div class="empty"><div class="ico">⚠️</div>' + sfEsc(err.message) + '</div>';
+}
+
+/* Modules */
+function loadModules() {
+  sfApi('/api/civic/modules').then(function (r) {
+    var items = r.data || [];
+    window._modules = items;
+    document.getElementById('tabBody').innerHTML = items.length ? '<div class="list">' + items.map(function (m) {
+      return '<div class="item' + (m.completed ? ' done' : '') + '">' +
+        '<div class="body">' +
+          '<h3>' + sfEsc(m.title) + '</h3>' +
+          '<p>' + sfEsc(m.summary || '') + '</p>' +
+          '<div class="meta">' +
+            '<span class="chip">⏱ ' + m.duration_min + ' min</span>' +
+            '<span class="chip pts">+' + m.points + ' points</span>' +
+            (m.completed ? '<span class="chip ok">✓ Terminée</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="side">' +
+          (m.completed
+            ? '<button class="btn btn-outline btn-sm" onclick="openModule(' + m.id + ')">Revoir</button>'
+            : '<button class="btn btn-orange btn-sm" onclick="openModule(' + m.id + ')">Commencer</button>') +
+        '</div>' +
+      '</div>';
+    }).join('') + '</div>' : emptyBox('📚', 'Les formations arrivent bientôt.');
+  }).catch(tabError);
+}
+
+function openModule(id) {
+  // Compare as text — ids may arrive as numbers or strings depending on the driver.
+  var m = (window._modules || []).filter(function (x) { return String(x.id) === String(id); })[0];
+  if (!m) return;
+  openModal(
+    m.title,
+    m.duration_min + ' min · +' + m.points + ' points',
+    m.content || m.summary || '',
+    m.completed
+      ? '<button class="btn btn-outline" onclick="closeModal()">Fermer</button>'
+      : '<button class="btn btn-outline" onclick="closeModal()">Plus tard</button>' +
+        '<button class="btn btn-orange" id="mDo" onclick="completeModule(' + m.id + ')">J\'ai terminé cette formation</button>'
+  );
+}
+
+function completeModule(id) {
+  var btn = document.getElementById('mDo');
+  sfBusy(btn, true, 'Enregistrement…');
+  sfApi('/api/civic/modules/' + id + '/complete', { method: 'POST' })
+    .then(function (r) {
+      closeModal();
+      toast('+' + (r.data.points_awarded || 0) + ' points — formation terminée');
+      return Promise.all([reloadDashboard(), loadModules()]);
+    })
+    .catch(function (err) { sfBusy(btn, false); alert(err.message); });
+}
+
+/* Consultations */
+function loadConsultations() {
+  sfApi('/api/civic/consultations').then(function (r) {
+    var items = r.data || [];
+    window._consults = items;
+    document.getElementById('tabBody').innerHTML = items.length ? '<div class="list">' + items.map(function (c) {
+      return '<div class="item' + (c.answered ? ' done' : '') + '">' +
+        '<div class="body">' +
+          '<h3>' + sfEsc(c.title) + '</h3>' +
+          '<p>' + sfEsc(c.description || '') + '</p>' +
+          '<div class="meta">' +
+            '<span class="chip">' + (c.kind === 'survey' ? '📊 Sondage' : '💬 Consultation') + '</span>' +
+            '<span class="chip pts">+' + c.points + ' points</span>' +
+            (c.answered ? '<span class="chip ok">✓ Participé</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="side">' +
+          (c.answered
+            ? '<button class="btn btn-outline btn-sm" onclick="showResults(' + c.id + ',\'' + sfEsc(c.title).replace(/'/g, "\\'") + '\')">Voir les résultats</button>'
+            : '<button class="btn btn-orange btn-sm" onclick="openConsult(' + c.id + ')">Participer</button>') +
+        '</div>' +
+      '</div>';
+    }).join('') + '</div>' : emptyBox('🗳️', 'Aucune consultation ouverte pour le moment.');
+  }).catch(tabError);
+}
+
+function openConsult(id) {
+  var c = (window._consults || []).filter(function (x) { return String(x.id) === String(id); })[0];
+  if (!c) return;
+  var body = '';
+  if (c.kind === 'survey' && c.options) {
+    body = (c.options || []).map(function (o, i) {
+      return '<label class="opt" onclick="selectOpt(this)">' +
+        '<input type="radio" name="sfopt" value="' + sfEsc(o.key) + '"' + (i === 0 ? '' : '') + '> ' +
+        sfEsc(o.label) + '</label>';
+    }).join('');
+  }
+  body += '<div class="field" style="margin-top:14px"><label>Votre commentaire (facultatif)</label>' +
+          '<textarea id="cComment" rows="3" placeholder="Votre avis compte…"></textarea></div>';
+
+  openModal(c.title, '+' + c.points + ' points', '',
+    '<button class="btn btn-outline" onclick="closeModal()">Annuler</button>' +
+    '<button class="btn btn-orange" id="mDo" onclick="submitConsult(' + c.id + ',' + (c.kind === 'survey' ? 'true' : 'false') + ')">Envoyer ma réponse</button>');
+  document.getElementById('mBody').innerHTML = body;
+}
+
+function selectOpt(el) {
+  Array.prototype.forEach.call(el.parentNode.querySelectorAll('.opt'), function (x) { x.classList.remove('sel'); });
+  el.classList.add('sel');
+}
+
+function submitConsult(id, isSurvey) {
+  var choiceEl = document.querySelector('input[name="sfopt"]:checked');
+  if (isSurvey && !choiceEl) return alert('Choisissez une réponse.');
+  var btn = document.getElementById('mDo');
+  sfBusy(btn, true, 'Envoi…');
+  sfApi('/api/civic/consultations/' + id + '/respond', {
+    method: 'POST',
+    body: { choice: choiceEl ? choiceEl.value : null, comment: (document.getElementById('cComment') || {}).value || null }
+  })
+    .then(function (r) {
+      closeModal();
+      toast('+' + (r.data.points_awarded || 0) + ' points — merci pour votre participation');
+      return Promise.all([reloadDashboard(), loadConsultations()]);
+    })
+    .catch(function (err) { sfBusy(btn, false); alert(err.message); });
+}
+
+function showResults(id, title) {
+  openModal(title, 'Résultats en direct', 'Chargement…', '<button class="btn btn-outline" onclick="closeModal()">Fermer</button>');
+
+  // Results come back keyed ('eau'); show the citizen the label they voted on.
+  var src = (window._consults || []).filter(function (x) { return String(x.id) === String(id); })[0];
+  var labels = {};
+  ((src || {}).options || []).forEach(function (o) { labels[o.key] = o.label; });
+
+  sfApi('/api/civic/consultations/' + id + '/results').then(function (r) {
+    var d = r.data || { total: 0, results: [] };
+    if (!d.total) { document.getElementById('mBody').innerHTML = 'Aucun résultat chiffré pour cette consultation.'; return; }
+    document.getElementById('mBody').innerHTML =
+      '<p style="margin-bottom:14px;color:var(--muted)">' + d.total + ' participation' + (d.total > 1 ? 's' : '') + '</p>' +
+      d.results.map(function (x) {
+        var pct = Math.round((x.votes / d.total) * 100);
+        return '<div style="margin-bottom:14px">' +
+          '<div style="display:flex;justify-content:space-between;font-size:14.4px;font-weight:700;margin-bottom:6px">' +
+            '<span>' + sfEsc(labels[x.choice] || x.choice) + '</span><span>' + pct + '%</span></div>' +
+          '<div class="progress" style="margin:0;max-width:none"><i style="width:' + pct + '%"></i></div></div>';
+      }).join('');
+  }).catch(function (err) { document.getElementById('mBody').textContent = err.message; });
+}
+
+/* Volunteer */
+function loadVolunteer() {
+  sfApi('/api/civic/volunteer').then(function (r) {
+    var items = r.data || [];
+    document.getElementById('tabBody').innerHTML = items.length ? '<div class="list">' + items.map(function (v) {
+      return '<div class="item' + (v.signed_up ? ' done' : '') + '">' +
+        '<div class="body">' +
+          '<h3>' + sfEsc(v.title) + '</h3>' +
+          '<p>' + sfEsc(v.description || '') + '</p>' +
+          '<div class="meta">' +
+            (v.location ? '<span class="chip">📍 ' + sfEsc(v.location) + '</span>' : '') +
+            (v.starts_at ? '<span class="chip">📅 ' + sfDate(v.starts_at) + '</span>' : '') +
+            '<span class="chip pts">+' + v.points + ' points</span>' +
+            (v.signed_up ? '<span class="chip ok">✓ Inscrit</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="side">' +
+          (v.signed_up
+            ? '<span class="chip grey">Inscription confirmée</span>'
+            : '<button class="btn btn-orange btn-sm" onclick="signup(' + v.id + ',this)">Je m\'inscris</button>') +
+        '</div>' +
+      '</div>';
+    }).join('') + '</div>' : emptyBox('🤝', 'Aucune mission de volontariat ouverte pour le moment.');
+  }).catch(tabError);
+}
+
+function signup(id, btn) {
+  sfBusy(btn, true, 'Inscription…');
+  sfApi('/api/civic/volunteer/' + id + '/signup', { method: 'POST' })
+    .then(function (r) {
+      toast('+' + (r.data.points_awarded || 0) + ' points — inscription enregistrée');
+      return Promise.all([reloadDashboard(), loadVolunteer()]);
+    })
+    .catch(function (err) { sfBusy(btn, false); alert(err.message); });
+}
+
+/* Notifications */
+function loadNotifications() {
+  sfApi('/api/civic/notifications').then(function (r) {
+    var items = r.data || [];
+    if (items.length) {
+      document.getElementById('tabAction').innerHTML =
+        '<button class="btn btn-outline btn-sm" onclick="markRead(this)">Tout marquer comme lu</button>';
+    }
+    document.getElementById('tabBody').innerHTML = items.length ? items.map(function (n) {
+      return '<div class="note' + (n.read_at ? '' : ' unread') + '">' +
+        '<div class="dot"></div>' +
+        '<div><h4>' + sfEsc(n.title) + '</h4>' +
+        '<p>' + sfEsc(n.body || '') + '</p>' +
+        '<time>' + sfDate(n.created_at) + '</time></div></div>';
+    }).join('') : emptyBox('🔔', 'Aucune notification pour le moment.');
+  }).catch(tabError);
+}
+
+function markRead(btn) {
+  sfBusy(btn, true, '…');
+  sfApi('/api/civic/notifications/read', { method: 'PUT' })
+    .then(function () { return Promise.all([reloadDashboard(), loadNotifications()]); })
+    .catch(function (err) { sfBusy(btn, false); alert(err.message); });
+}
+
+/* Profile */
+function loadProfile() {
+  var opts = SF_DEPARTMENTS.map(function (d) {
+    return '<option value="' + d + '"' + (me.department === d ? ' selected' : '') + '>' + d + '</option>';
+  }).join('');
+  document.getElementById('tabBody').innerHTML =
+    '<div class="form-msg" id="pMsg"></div>' +
+    '<div style="max-width:560px">' +
+      '<div class="field"><label>Nom complet</label><input id="pName" value="' + sfEsc(me.full_name) + '"></div>' +
+      '<div class="field-row">' +
+        '<div class="field"><label>Département</label><select id="pDep"><option value="">Choisir…</option>' + opts + '</select></div>' +
+        '<div class="field"><label>Commune</label><input id="pCom" value="' + sfEsc(me.commune || '') + '"></div>' +
+      '</div>' +
+      '<div class="field"><label>Année de naissance</label><input type="number" id="pYear" min="1920" max="2015" value="' + sfEsc(me.birth_year || '') + '"></div>' +
+      '<div class="field"><label>Contact vérifié</label><input value="' + sfEsc(me.email || me.phone || '') + '" disabled style="background:#f6f8fb;color:var(--muted)"></div>' +
+      '<button class="btn btn-blue" id="pSave" onclick="saveProfile()">Enregistrer mes informations</button>' +
+      '<p style="color:var(--muted);font-size:13.4px;margin-top:12px">Compléter votre profil vous rapporte 10 points, une seule fois.</p>' +
+    '</div>';
+}
+
+function saveProfile() {
+  var btn = document.getElementById('pSave');
+  sfMsg('pMsg', '');
+  sfBusy(btn, true, 'Enregistrement…');
+  sfApi('/api/auth/profile', {
+    method: 'PUT',
+    body: {
+      full_name: document.getElementById('pName').value.trim(),
+      department: document.getElementById('pDep').value || null,
+      commune: document.getElementById('pCom').value.trim() || null,
+      birth_year: document.getElementById('pYear').value ? Number(document.getElementById('pYear').value) : null
+    }
+  })
+    .then(function (r) {
+      me = r.data;
+      sfSetSession(sfToken(), me);
+      sfBusy(btn, false);
+      sfMsg('pMsg', 'Vos informations ont été enregistrées.', 'ok');
+      return reloadDashboard();
+    })
+    .catch(function (err) { sfBusy(btn, false); sfMsg('pMsg', err.message); });
+}
+
+/* ── Modal + toast ──────────────────────────────────────────────────────── */
+function openModal(title, sub, body, actions) {
+  document.getElementById('mTitle').textContent = title;
+  document.getElementById('mSub').textContent = sub || '';
+  document.getElementById('mBody').textContent = body || '';
+  document.getElementById('mActions').innerHTML = actions || '';
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+function toast(text) {
+  var t = document.createElement('div');
+  t.textContent = text;
+  t.style.cssText = 'position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#0f7a43;color:#fff;' +
+    'padding:13px 22px;border-radius:12px;font-weight:700;font-size:14.5px;z-index:200;box-shadow:0 10px 30px -12px rgba(0,0,0,.5)';
+  document.body.appendChild(t);
+  setTimeout(function () { t.style.transition = 'opacity .4s'; t.style.opacity = '0'; }, 2600);
+  setTimeout(function () { t.remove(); }, 3100);
+}
+function emptyBox(ico, text) {
+  return '<div class="empty"><div class="ico">' + ico + '</div>' + text + '</div>';
+}
+
+/* ── Boot ───────────────────────────────────────────────────────────────── */
+// Refresh the profile from the API so the header and profile tab are never stale.
+sfApi('/api/auth/me')
+  .then(function (r) { me = r.data; sfSetSession(sfToken(), me); })
+  .catch(function () {})
+  .then(function () { return reloadDashboard(); })
+  .then(function () { loadTab('modules'); })
+  .catch(function (err) {
+    document.getElementById('greetSub').textContent = err.message;
+  });
+
+if (/[?&]welcome=1/.test(location.search)) {
+  setTimeout(function () { toast('Bienvenue sur STARFLEX — votre compte est vérifié'); }, 700);
+}
+
+}
+</script>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-bottom" style="border-top:0;padding-top:0">
+      <span>&copy; 2026 STARFLEX. Tous droits r&eacute;serv&eacute;s.</span>
+      <span class="powered">Powered by <b>HaitiBiznis Technologies</b></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

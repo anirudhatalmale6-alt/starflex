@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Espace Citoyen — STARFLEX</title>
-<meta name="description" content="L'espace citoyen STARFLEX : profil, points, certificat et notifications. Ouverture prochaine.">
+<meta name="description" content="L'espace citoyen STARFLEX : inscription, formations civiques, consultations publiques, points d'engagement et Certificat National de Participation Citoyenne.">
 <meta property="og:title" content="Espace Citoyen — STARFLEX">
-<meta property="og:description" content="L'espace citoyen STARFLEX : profil, points, certificat et notifications. Ouverture prochaine.">
+<meta property="og:description" content="Inscrivez-vous, formez-vous, participez — et faites reconnaître votre engagement citoyen.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/starflex.css">
+<link rel="stylesheet" href="assets/starflex-portal.css">
 <link rel="icon" href="assets/starflex-logo.png">
 </head>
 <body>
@@ -18,15 +19,15 @@
 <header class="site-header">
   <div class="wrap nav">
     <a class="brand" href="index.html"><img src="assets/starflex-logo.png" alt="STARFLEX"></a>
-    <button class="burger" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+    <button class="burger" onclick="sfToggleNav()" aria-label="Menu">&#9776;</button>
     <nav class="nav-links" id="navLinks">
-      <a href="index.html" class="active">Accueil</a>
+      <a href="index.html">Accueil</a>
       <a href="about.html">&Agrave; propos</a>
       <a href="one-for-seven.html">One For Seven</a>
       <a href="civic-engagement.html">Engagement Civique</a>
       <a href="resources.html">Ressources</a>
       <a href="contact.html">Contact</a>
-      <a href="portal.html" class="nav-cta">Espace Citoyen</a>
+      <a href="portal.html" class="nav-cta active">Espace Citoyen</a>
     </nav>
   </div>
 </header>
@@ -34,30 +35,72 @@
 <div class="page-hero">
   <div class="wrap">
     <h1>Espace Citoyen</h1>
-    <p>Inscription, tableau de bord et Certificat National de Participation Citoyenne.</p>
+    <p>Inscrivez-vous, formez-vous, participez — et obtenez votre Certificat National de Participation Citoyenne.</p>
   </div>
 </div>
 
 <section>
   <div class="wrap">
     <div class="section-head">
-      <div class="kicker">Espace Citoyen</div>
-      <h2>Votre espace personnel arrive bientôt</h2>
-      <p>L'inscription citoyenne, le tableau de bord personnel et le Certificat National de Participation Citoyenne sont en cours de développement (Phase 2).</p>
+      <div class="kicker">Votre parcours</div>
+      <h2>Quatre étapes, quelques minutes</h2>
+      <p>Tout se fait depuis votre téléphone ou votre ordinateur, sans déplacement.</p>
     </div>
+
     <div class="grid grid-4">
-      <div class="card"><div class="ico">👤</div><h3>Mon Profil</h3><p>Vos informations personnelles et votre parcours citoyen.</p></div>
-      <div class="card orange"><div class="ico">🏅</div><h3>Mes Points</h3><p>Vos points d'engagement et vos distinctions.</p></div>
-      <div class="card"><div class="ico">📜</div><h3>Mon Certificat</h3><p>Votre Certificat National de Participation Citoyenne.</p></div>
-      <div class="card orange"><div class="ico">🔔</div><h3>Notifications</h3><p>Rappels électoraux et nouvelles consultations.</p></div>
+      <div class="card">
+        <div class="step-num">1</div>
+        <h3>Créez votre compte</h3>
+        <p>Nom, contact et commune. Votre compte est confirmé par un code de vérification.</p>
+      </div>
+      <div class="card orange">
+        <div class="step-num">2</div>
+        <h3>Formez-vous</h3>
+        <p>Des modules courts sur les institutions, le processus électoral et vos droits.</p>
+      </div>
+      <div class="card">
+        <div class="step-num">3</div>
+        <h3>Participez</h3>
+        <p>Consultations publiques, sondages citoyens et missions de volontariat.</p>
+      </div>
+      <div class="card orange">
+        <div class="step-num">4</div>
+        <h3>Faites-vous reconnaître</h3>
+        <p>Vos points ouvrent droit au Certificat National de Participation Citoyenne.</p>
+      </div>
     </div>
-    <div class="center mt-24">
-      <p style="color:var(--muted);margin-bottom:18px">Laissez-nous votre email pour être prévenu dès l'ouverture des inscriptions.</p>
-      <form style="max-width:420px;margin:0 auto" onsubmit="event.preventDefault();document.getElementById('nOk').style.display='block';this.reset();">
-        <div class="field"><input type="email" required placeholder="votre@email.com"></div>
-        <button class="btn btn-orange" style="width:100%" type="submit">Me prévenir au lancement</button>
-        <div id="nOk" style="display:none;margin-top:12px;color:#0f9d55;font-weight:700">✓ Merci ! Nous vous préviendrons.</div>
-      </form>
+
+    <div class="center mt-24" style="margin-top:38px">
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a class="btn btn-orange" href="register.html" id="ctaMain">Créer mon compte citoyen</a>
+        <a class="btn btn-blue" href="login.html" id="ctaAlt">J'ai déjà un compte</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap split">
+    <div>
+      <div class="kicker" style="color:var(--orange);font-weight:800;font-size:13px;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:10px">Certificat National</div>
+      <h2>Un engagement reconnu et vérifiable</h2>
+      <p>Chaque action citoyenne enregistrée sur la plateforme vous rapporte des points. Trois niveaux de certificat récompensent votre parcours.</p>
+      <ul class="checklist">
+        <li><b>Bronze</b> — à partir de 30 points</li>
+        <li><b>Argent</b> — à partir de 75 points</li>
+        <li><b>Or</b> — à partir de 150 points</li>
+      </ul>
+      <p style="font-size:14.6px">Chaque certificat porte un code unique qu'une institution, une école ou un employeur peut vérifier publiquement en quelques secondes.</p>
+      <a class="btn btn-blue mt-24" href="certificate.html">Vérifier un certificat</a>
+    </div>
+    <div>
+      <div class="cert">
+        <div class="seal">🏅</div>
+        <h3>Certificat National de<br>Participation Citoyenne</h3>
+        <div class="lvl">Niveau Argent</div>
+        <div class="code">SF-00000-XXXXX</div>
+        <p>Exemple de certificat délivré automatiquement par la plateforme.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -77,11 +120,11 @@
         <a href="portal.html">Espace Citoyen</a>
       </div>
       <div>
-        <h4>Ressources</h4>
-        <a href="resources.html">Actualit&eacute;s</a>
+        <h4>Espace Citoyen</h4>
+        <a href="register.html">Cr&eacute;er un compte</a>
+        <a href="login.html">Se connecter</a>
+        <a href="certificate.html">V&eacute;rifier un certificat</a>
         <a href="resources.html#faq">Questions fr&eacute;quentes</a>
-        <a href="resources.html#events">&Eacute;v&eacute;nements</a>
-        <a href="resources.html#downloads">T&eacute;l&eacute;chargements</a>
       </div>
       <div>
         <h4>Contact</h4>
@@ -97,6 +140,17 @@
     </div>
   </div>
 </footer>
+
+<script src="assets/starflex-app.js"></script>
+<script>
+// A citizen who is already signed in shouldn't be asked to register again.
+if (sfToken()) {
+  var main = document.getElementById('ctaMain');
+  main.textContent = 'Ouvrir mon espace citoyen';
+  main.href = 'dashboard.html';
+  document.getElementById('ctaAlt').style.display = 'none';
+}
+</script>
 
 </body>
 </html>

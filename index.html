@@ -62,7 +62,7 @@
       <p class="one" data-i18n="home.sub">STARFLEX récompense les citoyens qui apprennent, participent et améliorent leur communauté.</p>
       <div class="h2-actions">
         <a class="btn btn-orange btn-xl" href="register.html"><span data-i18n="home.cta1">Je Commence</span></a>
-        <a class="btn btn-outline-blue btn-xl" href="#video">▶ <span data-i18n="home.cta2">Voir la vidéo (2 min)</span></a>
+        <a class="btn btn-outline-blue btn-xl" href="#video">▶ <span data-i18n="home.cta2">Voir les vidéos</span></a>
       </div>
     </div>
 
@@ -409,7 +409,7 @@ function runCounters() {
    Each entry takes either a YouTube id OR a file under assets/video/.
    Leave both empty and the card shows a "coming soon" state instead. */
 var SF_VIDEOS = [
-  // A YouTube Short is filmed vertically, so its player opens in portrait.
+  // portrait applies only when the clip is self-hosted; see openVideo.
   { key: 'v1', youtube: 'anCl5VM4-OM', file: '', length: '', portrait: true },
   { key: 'v2', youtube: 'Nzs8Fknjypc', file: '', length: '', portrait: false }
 ];
@@ -441,7 +441,11 @@ function renderVideos() {
 function openVideo(i) {
   var v = SF_VIDEOS[i];
   if (!v || (!v.youtube && !v.file)) return;
-  document.getElementById('vModal').classList.toggle('portrait', !!v.portrait);
+  // YouTube's embedded player is built around a 16:9 stage: give it a 9:16 iframe
+  // and it scales to fill and crops the sides (it cut the text off the Short).
+  // So YouTube always gets 16:9 and pads vertical clips itself — nothing is lost.
+  // Self-hosted files keep a portrait stage, where <video> letterboxes safely.
+  document.getElementById('vModal').classList.toggle('portrait', !!v.portrait && !v.youtube);
   document.getElementById('vFrame').innerHTML = v.youtube
     ? '<iframe src="https://www.youtube-nocookie.com/embed/' + v.youtube + '?autoplay=1&rel=0" ' +
       'frameborder="0" allow="accelerometer; autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>'

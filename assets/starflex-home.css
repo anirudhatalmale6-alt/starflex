@@ -273,6 +273,14 @@
 .h2-herologo{height:86px;width:auto;margin-bottom:22px}
 @media(max-width:940px){.h2-herologo{height:64px;margin-bottom:16px}}
 
-/* Vertical clips (YouTube Shorts) need a portrait stage, not a letterboxed 16:9 one. */
+/* Portrait stage is for SELF-HOSTED vertical clips only — a <video> element we can
+   letterbox ourselves. YouTube embeds always stay 16:9 (see openVideo): forcing a
+   9:16 iframe makes the player scale to fill and crop the sides. */
 .v-modal.portrait .v-box{max-width:420px}
 .v-modal.portrait .v-frame{aspect-ratio:9/16}
+.v-frame video{object-fit:contain;background:#000}
+/* A vertical clip inside the 16:9 stage is small on a phone — use the full width. */
+@media(max-width:760px){
+  .v-modal{padding:14px}
+  .v-close{top:-40px}
+}

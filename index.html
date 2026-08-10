@@ -51,6 +51,7 @@
 <section class="h2-hero">
   <div class="wrap">
     <div>
+      <img class="h2-herologo" src="assets/starflex-logo-transparent.png" alt="STARFLEX">
       <span class="h2-badge" data-i18n="home.welcome">🇭🇹 Bienvenue sur STARFLEX</span>
       <h1>
         <span data-i18n="home.h1a">Apprends</span>
@@ -408,8 +409,9 @@ function runCounters() {
    Each entry takes either a YouTube id OR a file under assets/video/.
    Leave both empty and the card shows a "coming soon" state instead. */
 var SF_VIDEOS = [
-  { key: 'v1', youtube: '', file: '', length: '2:00' },
-  { key: 'v2', youtube: '', file: '', length: '' }
+  // A YouTube Short is filmed vertically, so its player opens in portrait.
+  { key: 'v1', youtube: 'anCl5VM4-OM', file: '', length: '', portrait: true },
+  { key: 'v2', youtube: 'Nzs8Fknjypc', file: '', length: '', portrait: false }
 ];
 
 function videoThumb(v) {
@@ -439,6 +441,7 @@ function renderVideos() {
 function openVideo(i) {
   var v = SF_VIDEOS[i];
   if (!v || (!v.youtube && !v.file)) return;
+  document.getElementById('vModal').classList.toggle('portrait', !!v.portrait);
   document.getElementById('vFrame').innerHTML = v.youtube
     ? '<iframe src="https://www.youtube-nocookie.com/embed/' + v.youtube + '?autoplay=1&rel=0" ' +
       'frameborder="0" allow="accelerometer; autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>'

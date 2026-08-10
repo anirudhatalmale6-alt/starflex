@@ -51,7 +51,7 @@ var SF_I18N = {
     'home.h1d': 'Fais évoluer Haïti',
     'home.sub': 'STARFLEX récompense les citoyens qui apprennent, participent et améliorent leur communauté.',
     'home.cta1': 'Je Commence',
-    'home.cta2': 'Voir la vidéo (2 min)',
+    'home.cta2': 'Voir les vidéos',
     'home.illus_alt': 'Jeunes Haïtiens souriants',
 
     'home.how': 'Comment ça marche ?',
@@ -519,7 +519,7 @@ var SF_I18N = {
     'home.h1d': 'Fè Ayiti avanse',
     'home.sub': 'STARFLEX rekonpanse sitwayen k ap aprann, k ap patisipe epi k ap amelyore kominote yo.',
     'home.cta1': 'Mwen Kòmanse',
-    'home.cta2': 'Gade videyo a (2 min)',
+    'home.cta2': 'Gade videyo yo',
     'home.illus_alt': 'Jèn ayisyen k ap souri',
 
     'home.how': 'Kijan sa mache ?',

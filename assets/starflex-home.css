@@ -241,3 +241,30 @@
 .h2-final h2{font-family:var(--font-head);font-size:38px;font-weight:800;line-height:1.12;margin-bottom:14px;letter-spacing:-1px}
 @media(max-width:940px){.h2-final h2{font-size:27px}.h2-final{padding:40px 22px}}
 .h2-final p{font-size:18px;opacity:.94;max-width:52ch;margin:0 auto 26px}
+
+/* ── Video grid + lightbox ────────────────────────────────────────────── */
+.h2-vgrid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:960px;margin:0 auto}
+@media(max-width:860px){.h2-vgrid{grid-template-columns:1fr}}
+.h2-vgrid .h2-video{max-width:none;margin:0}
+.h2-video.pending{cursor:default}
+.h2-video .v-poster{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.62;
+}
+.h2-video:not(.pending):hover .v-poster{opacity:.5}
+.h2-video .inner{z-index:2}
+.h2-video .cap{font-size:18px}
+
+.v-modal{
+  position:fixed;inset:0;background:rgba(8,26,42,.9);display:none;align-items:center;justify-content:center;
+  padding:20px;z-index:300;
+}
+.v-modal.open{display:flex}
+.v-box{width:100%;max-width:960px;position:relative}
+.v-frame{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:16px;overflow:hidden;
+  box-shadow:0 30px 70px -30px rgba(0,0,0,.9)}
+.v-frame iframe,.v-frame video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.v-close{
+  position:absolute;top:-46px;right:0;background:none;border:0;color:#fff;font-size:34px;line-height:1;
+  cursor:pointer;padding:4px 10px;border-radius:8px;
+}
+.v-close:hover{background:rgba(255,255,255,.14)}

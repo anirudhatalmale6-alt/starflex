@@ -114,7 +114,9 @@ var SF_I18N = {
     'home.g3': 'Consultations',
     'home.g4': 'Communautés',
 
-    'home.video': 'STARFLEX en 2 minutes',
+    'home.video': 'STARFLEX en vidéo',
+    'home.v1': 'Vidéo de présentation',
+    'home.v2': 'STARFLEX : Citoyenneté Active',
     'home.videos': 'Comprendre la plateforme et le programme One For Seven.',
     'home.video_soon': 'La vidéo de présentation arrive bientôt',
 
@@ -580,7 +582,9 @@ var SF_I18N = {
     'home.g3': 'Konsiltasyon',
     'home.g4': 'Kominote',
 
-    'home.video': 'STARFLEX nan 2 minit',
+    'home.video': 'STARFLEX an videyo',
+    'home.v1': 'Videyo prezantasyon',
+    'home.v2': 'STARFLEX : Sitwayènte Aktif',
     'home.videos': 'Konprann platfòm nan ak pwogram One For Seven an.',
     'home.video_soon': 'Videyo prezantasyon an ap vini talè',
 

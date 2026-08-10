@@ -280,22 +280,24 @@
   </div>
 </section>
 
-<!-- ══ VIDEO ══ -->
+<!-- ══ VIDEOS ══ -->
 <section class="h2-sec tint" id="video">
   <div class="wrap">
     <div class="h2-head rv">
-      <h2 data-i18n="home.video">STARFLEX en 2 minutes</h2>
+      <h2 data-i18n="home.video">STARFLEX en vidéo</h2>
       <p data-i18n="home.videos">Comprendre la plateforme et le programme One For Seven.</p>
     </div>
-    <div class="h2-video rv">
-      <div class="inner">
-        <div class="play">▶</div>
-        <div class="cap" data-i18n="home.video_soon">La vidéo de présentation arrive bientôt</div>
-      </div>
-      <span class="len">2:00</span>
-    </div>
+    <div class="h2-vgrid" id="videoGrid"></div>
   </div>
 </section>
+
+<!-- Lightbox player -->
+<div class="v-modal" id="vModal" onclick="closeVideo(event)">
+  <div class="v-box">
+    <button class="v-close" onclick="closeVideo()" aria-label="Fermer">&times;</button>
+    <div class="v-frame" id="vFrame"></div>
+  </div>
+</div>
 
 <!-- ══ PARTNERS ══ -->
 <section class="h2-sec">
@@ -401,6 +403,58 @@ function runCounters() {
     requestAnimationFrame(step);
   });
 }
+
+/* ── Videos ───────────────────────────────────────────────────────────────
+   Each entry takes either a YouTube id OR a file under assets/video/.
+   Leave both empty and the card shows a "coming soon" state instead. */
+var SF_VIDEOS = [
+  { key: 'v1', youtube: '', file: '', length: '2:00' },
+  { key: 'v2', youtube: '', file: '', length: '' }
+];
+
+function videoThumb(v) {
+  // A YouTube video brings its own poster frame; a local file gets the brand card.
+  return v.youtube
+    ? '<img class="v-poster" src="https://img.youtube.com/vi/' + v.youtube + '/hqdefault.jpg" alt="" loading="lazy">'
+    : '';
+}
+
+function renderVideos() {
+  var grid = document.getElementById('videoGrid');
+  if (!grid) return;
+  grid.innerHTML = SF_VIDEOS.map(function (v, i) {
+    var ready = !!(v.youtube || v.file);
+    return '<div class="h2-video rv in' + (ready ? '' : ' pending') + '"' +
+        (ready ? ' onclick="openVideo(' + i + ')" role="button" tabindex="0"' : '') + '>' +
+        videoThumb(v) +
+        '<div class="inner">' +
+          '<div class="play">▶</div>' +
+          '<div class="cap">' + sfT(ready ? 'home.' + v.key : 'home.video_soon') + '</div>' +
+        '</div>' +
+        (v.length ? '<span class="len">' + v.length + '</span>' : '') +
+      '</div>';
+  }).join('');
+}
+
+function openVideo(i) {
+  var v = SF_VIDEOS[i];
+  if (!v || (!v.youtube && !v.file)) return;
+  document.getElementById('vFrame').innerHTML = v.youtube
+    ? '<iframe src="https://www.youtube-nocookie.com/embed/' + v.youtube + '?autoplay=1&rel=0" ' +
+      'frameborder="0" allow="accelerometer; autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>'
+    : '<video src="assets/video/' + v.file + '" controls autoplay playsinline></video>';
+  document.getElementById('vModal').classList.add('open');
+}
+
+function closeVideo(e) {
+  if (e && e.target && e.target.closest('.v-box') && !e.target.classList.contains('v-close')) return;
+  document.getElementById('vModal').classList.remove('open');
+  document.getElementById('vFrame').innerHTML = '';   // stops playback
+}
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeVideo(); });
+
+renderVideos();
+window.sfOnLangChange = renderVideos;
 
 /* The marquee needs its items duplicated so the loop is seamless. */
 (function () {

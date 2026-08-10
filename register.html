@@ -26,6 +26,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/starflex.css">
+<link rel="stylesheet" href="assets/starflex-home.css">
 <link rel="stylesheet" href="assets/starflex-portal.css">
 <link rel="icon" href="assets/starflex-logo.png">
 </head>
@@ -34,15 +35,14 @@
 <header class="site-header">
   <div class="wrap nav">
     <a class="brand" href="index.html"><img src="assets/starflex-logo.png" alt="STARFLEX"></a>
-    <button class="burger" onclick="sfToggleNav()" aria-label="Menu">&#9776;</button>
+    <div class="lang-switch"></div>
+    <button class="burger" onclick="sfToggleNav()" data-i18n-title="nav.menu">&#9776;</button>
     <nav class="nav-links" id="navLinks">
-      <a href="index.html">Accueil</a>
-      <a href="about.html">&Agrave; propos</a>
-      <a href="one-for-seven.html">One For Seven</a>
-      <a href="civic-engagement.html">Engagement Civique</a>
-      <a href="resources.html">Ressources</a>
-      <a href="contact.html">Contact</a>
-      <a href="login.html" class="nav-cta">Se connecter</a>
+      <a href="index.html"><span class="ni">🏠</span><span data-i18n="nav.home">Accueil</span></a>
+      <a href="civic-engagement.html"><span class="ni">📚</span><span data-i18n="nav.learn">Apprendre</span></a>
+      <a href="one-for-seven.html"><span class="ni">🗳️</span><span data-i18n="nav.participate">Participer</span></a>
+      <a href="portal.html#certificat"><span class="ni">🏆</span><span data-i18n="nav.rewards">Récompenses</span></a>
+      <a href="portal.html" class="nav-cta"><span class="ni">👤</span><span data-i18n="nav.account">Mon compte</span></a>
     </nav>
   </div>
 </header>
@@ -51,65 +51,66 @@
   <div class="auth-card wide">
     <div class="auth-head">
       <img src="assets/starflex-logo.png" alt="STARFLEX">
-      <h1>Créer mon compte citoyen</h1>
-      <p>Quelques informations suffisent pour commencer votre parcours civique.</p>
+      <h1 data-i18n="auth.reg_h1">Créer mon compte citoyen</h1>
+      <p data-i18n="auth.reg_sub">Quelques informations suffisent pour commencer votre parcours civique.</p>
     </div>
 
     <div class="form-msg" id="msg"></div>
 
     <form id="regForm" novalidate>
       <div class="field">
-        <label for="full_name">Nom complet *</label>
-        <input type="text" id="full_name" name="full_name" required autocomplete="name" placeholder="Ex. Marie Joseph">
+        <label for="full_name" data-i18n="auth.fullname">Nom complet *</label>
+        <input type="text" id="full_name" name="full_name" required autocomplete="name" data-i18n-ph="auth.fullname_ph" placeholder="Ex. Marie Joseph">
       </div>
 
       <div class="field-row">
         <div class="field">
-          <label for="email">Adresse email</label>
+          <label for="email" data-i18n="auth.email">Adresse email</label>
           <input type="email" id="email" name="email" autocomplete="email" placeholder="votre@email.com">
         </div>
         <div class="field">
-          <label for="phone">Téléphone</label>
+          <label for="phone" data-i18n="auth.phone">Téléphone</label>
           <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+509 ...">
         </div>
       </div>
       <div class="field" style="margin-top:-8px">
-        <div class="hint">Renseignez au moins l'un des deux — c'est là que nous enverrons votre code de vérification.</div>
+        <div class="hint" data-i18n="auth.contact_hint">Renseignez au moins l'un des deux — c'est là que nous enverrons votre code de vérification.</div>
       </div>
 
       <div class="field-row">
         <div class="field">
-          <label for="department">Département</label>
+          <label for="department" data-i18n="auth.department">Département</label>
           <select id="department" name="department">
-            <option value="">Choisir…</option>
+            <option value="" data-i18n="auth.choose">Choisir…</option>
           </select>
         </div>
         <div class="field">
-          <label for="commune">Commune</label>
-          <input type="text" id="commune" name="commune" placeholder="Ex. Port-au-Prince">
+          <label for="commune" data-i18n="auth.commune">Commune</label>
+          <input type="text" id="commune" name="commune" data-i18n-ph="auth.commune_ph" placeholder="Ex. Port-au-Prince">
         </div>
       </div>
 
       <div class="field-row">
         <div class="field">
-          <label for="birth_year">Année de naissance</label>
+          <label for="birth_year" data-i18n="auth.birth">Année de naissance</label>
           <input type="number" id="birth_year" name="birth_year" min="1920" max="2015" placeholder="Ex. 1995">
         </div>
         <div class="field">
-          <label for="password">Mot de passe *</label>
-          <input type="password" id="password" name="password" required minlength="6" autocomplete="new-password" placeholder="6 caractères minimum">
+          <label for="password" data-i18n="auth.password">Mot de passe *</label>
+          <input type="password" id="password" name="password" required minlength="6" autocomplete="new-password" data-i18n-ph="auth.password_ph" placeholder="6 caractères minimum">
         </div>
       </div>
 
-      <button class="btn btn-orange btn-full" type="submit" id="submitBtn">Créer mon compte</button>
+      <button class="btn btn-orange btn-full" type="submit" id="submitBtn" data-i18n="auth.reg_btn">Créer mon compte</button>
     </form>
 
     <div class="auth-alt">
-      Vous avez déjà un compte ? <a href="login.html">Se connecter</a>
+      <span data-i18n="auth.have_acct">Vous avez déjà un compte ?</span> <a href="login.html" data-i18n="auth.signin">Se connecter</a>
     </div>
   </div>
 </div>
 
+<script src="assets/starflex-i18n.js"></script>
 <script src="assets/starflex-app.js"></script>
 <script>
 // Departments come from the shared list so the portal and admin stay consistent.
@@ -136,11 +137,11 @@ document.getElementById('regForm').addEventListener('submit', function (e) {
     password: document.getElementById('password').value
   };
 
-  if (!payload.full_name) return sfMsg('msg', 'Votre nom complet est requis.');
-  if (!payload.email && !payload.phone) return sfMsg('msg', 'Indiquez une adresse email ou un numéro de téléphone.');
-  if (payload.password.length < 6) return sfMsg('msg', 'Le mot de passe doit contenir au moins 6 caractères.');
+  if (!payload.full_name) return sfMsg('msg', sfT('msg.name_required'));
+  if (!payload.email && !payload.phone) return sfMsg('msg', sfT('msg.contact_required'));
+  if (payload.password.length < 6) return sfMsg('msg', sfT('msg.password_short'));
 
-  sfBusy(btn, true, 'Création du compte…');
+  sfBusy(btn, true, sfT('msg.creating'));
   sfApi('/api/auth/register', { method: 'POST', body: payload })
     .then(function (res) {
       var d = res.data || {};
@@ -160,9 +161,36 @@ document.getElementById('regForm').addEventListener('submit', function (e) {
 
 <footer class="site-footer">
   <div class="wrap">
-    <div class="footer-bottom" style="border-top:0;padding-top:0">
-      <span>&copy; 2026 STARFLEX. Tous droits r&eacute;serv&eacute;s.</span>
-      <span class="powered">Powered by <b>HaitiBiznis Technologies</b></span>
+    <div class="footer-grid">
+      <div>
+        <div class="logo-foot"><img src="assets/starflex-logo.png" alt="STARFLEX"></div>
+        <p class="tag" data-i18n="foot.tag">Des idées pour transformer et développer les générations futures.</p>
+      </div>
+      <div>
+        <h4 data-i18n="foot.platform">Plateforme</h4>
+        <a href="about.html" data-i18n="foot.about">À propos</a>
+        <a href="one-for-seven.html" data-i18n="foot.ofs">One For Seven</a>
+        <a href="civic-engagement.html" data-i18n="foot.civic">Engagement Civique</a>
+        <a href="portal.html" data-i18n="foot.citizen">Espace Citoyen</a>
+      </div>
+      <div>
+        <h4 data-i18n="foot.citizen">Espace Citoyen</h4>
+        <a href="register.html" data-i18n="foot.createacct">Créer un compte</a>
+        <a href="login.html" data-i18n="foot.signin">Se connecter</a>
+        <a href="certificate.html" data-i18n="foot.verifycert">Vérifier un certificat</a>
+        <a href="resources.html#faq" data-i18n="foot.faq">Questions fréquentes</a>
+      </div>
+      <div>
+        <h4 data-i18n="foot.contact">Contact</h4>
+        <a href="contact.html" data-i18n="foot.write">Nous écrire</a>
+        <a href="contact.html#whatsapp">WhatsApp</a>
+        <a href="https://myplopplop.com" target="_blank">MyPlopPlop</a>
+        <a href="https://haitibiznis.com" target="_blank">HaitiBiznis</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="foot.rights">&copy; 2026 STARFLEX. Tous droits r&eacute;serv&eacute;s.</span>
+      <span class="powered"><span data-i18n="foot.powered">Powered by</span> <b>HaitiBiznis Technologies</b></span>
     </div>
   </div>
 </footer>

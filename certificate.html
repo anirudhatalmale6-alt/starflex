@@ -26,6 +26,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/starflex.css">
+<link rel="stylesheet" href="assets/starflex-home.css">
 <link rel="stylesheet" href="assets/starflex-portal.css">
 <link rel="icon" href="assets/starflex-logo.png">
 <style>
@@ -42,15 +43,14 @@
 <header class="site-header">
   <div class="wrap nav">
     <a class="brand" href="index.html"><img src="assets/starflex-logo.png" alt="STARFLEX"></a>
-    <button class="burger" onclick="sfToggleNav()" aria-label="Menu">&#9776;</button>
+    <div class="lang-switch"></div>
+    <button class="burger" onclick="sfToggleNav()" data-i18n-title="nav.menu">&#9776;</button>
     <nav class="nav-links" id="navLinks">
-      <a href="index.html">Accueil</a>
-      <a href="about.html">&Agrave; propos</a>
-      <a href="one-for-seven.html">One For Seven</a>
-      <a href="civic-engagement.html">Engagement Civique</a>
-      <a href="resources.html">Ressources</a>
-      <a href="contact.html">Contact</a>
-      <a href="portal.html" class="nav-cta">Espace Citoyen</a>
+      <a href="index.html"><span class="ni">🏠</span><span data-i18n="nav.home">Accueil</span></a>
+      <a href="civic-engagement.html"><span class="ni">📚</span><span data-i18n="nav.learn">Apprendre</span></a>
+      <a href="one-for-seven.html"><span class="ni">🗳️</span><span data-i18n="nav.participate">Participer</span></a>
+      <a href="portal.html#certificat"><span class="ni">🏆</span><span data-i18n="nav.rewards">Récompenses</span></a>
+      <a href="portal.html" class="nav-cta"><span class="ni">👤</span><span data-i18n="nav.account">Mon compte</span></a>
     </nav>
   </div>
 </header>
@@ -59,16 +59,16 @@
   <div class="auth-card wide">
     <div class="auth-head no-print">
       <img src="assets/starflex-logo.png" alt="STARFLEX">
-      <h1>Vérifier un certificat</h1>
-      <p>Chaque Certificat National de Participation Citoyenne porte un code unique, vérifiable par toute institution ou employeur.</p>
+      <h1 data-i18n="cert.h1">Vérifier un certificat</h1>
+      <p data-i18n="cert.sub">Chaque Certificat National de Participation Citoyenne porte un code unique, vérifiable par toute institution ou employeur.</p>
     </div>
 
     <form id="vForm" class="no-print">
       <div class="field">
-        <label for="code">Code du certificat</label>
+        <label for="code" data-i18n="cert.code">Code du certificat</label>
         <input type="text" id="code" placeholder="Ex. SF-00001-TQP1I" autocapitalize="characters" spellcheck="false">
       </div>
-      <button class="btn btn-blue btn-full" type="submit" id="submitBtn">Vérifier</button>
+      <button class="btn btn-blue btn-full" type="submit" id="submitBtn" data-i18n="cert.btn">Vérifier</button>
     </form>
 
     <div class="form-msg no-print" id="msg" style="margin-top:16px"></div>
@@ -76,13 +76,14 @@
   </div>
 </div>
 
+<script src="assets/starflex-i18n.js"></script>
 <script src="assets/starflex-app.js"></script>
 <script>
 function verify(code) {
   sfMsg('msg', '');
   document.getElementById('result').innerHTML = '';
   var btn = document.getElementById('submitBtn');
-  sfBusy(btn, true, 'Vérification…');
+  sfBusy(btn, true, sfT('msg.verifying'));
 
   sfApi('/api/civic/certificate/verify/' + encodeURIComponent(code))
     .then(function (r) {
@@ -93,28 +94,26 @@ function verify(code) {
           '<div class="seal">' + (c.valid ? '🏅' : '⛔') + '</div>' +
           '<div style="font-size:13px;letter-spacing:1.6px;text-transform:uppercase;font-weight:800;color:' +
             (c.valid ? '#0f7a43' : '#b3261e') + ';margin-bottom:10px">' +
-            (c.valid ? '✓ Certificat authentique' : 'Certificat révoqué') + '</div>' +
+            (c.valid ? sfT('cert.valid') : sfT('cert.revoked')) + '</div>' +
           '<h3>' + sfEsc(c.holder) + '</h3>' +
-          '<div class="lvl">Niveau ' + sfEsc(c.level) + '</div>' +
+          '<div class="lvl">' + sfT('dash.level') + ' ' + sfEsc(sfLevelName(c.level)) + '</div>' +
           '<div class="code">' + sfEsc(c.code) + '</div>' +
-          '<p>' + (c.department ? 'Département : ' + sfEsc(c.department) + ' · ' : '') +
-            'Délivré le ' + sfDate(c.issued_at) + '</p>' +
-          '<p style="margin-top:12px;font-size:13px">Certificat National de Participation Citoyenne — STARFLEX</p>' +
-          '<div class="no-print" style="margin-top:16px"><button class="btn btn-outline btn-sm" onclick="window.print()">Imprimer</button></div>' +
+          '<p>' + (c.department ? sfT('cert.dept') + ' ' + sfEsc(c.department) + ' · ' : '') +
+            sfT('cert.issued') + ' ' + sfDate(c.issued_at) + '</p>' +
+          '<p style="margin-top:12px;font-size:13px">' + sfT('cert.name') + '</p>' +
+          '<div class="no-print" style="margin-top:16px"><button class="btn btn-outline btn-sm" onclick="window.print()">' + sfT('cert.print') + '</button></div>' +
         '</div>';
     })
     .catch(function (err) {
       sfBusy(btn, false);
-      sfMsg('msg', err.status === 404
-        ? 'Aucun certificat ne correspond à ce code. Vérifiez la saisie.'
-        : err.message);
+      sfMsg('msg', err.status === 404 ? sfT('cert.notfound') : err.message);
     });
 }
 
 document.getElementById('vForm').addEventListener('submit', function (e) {
   e.preventDefault();
   var code = document.getElementById('code').value.trim().toUpperCase();
-  if (!code) return sfMsg('msg', 'Saisissez un code de certificat.');
+  if (!code) return sfMsg('msg', sfT('cert.enter'));
   verify(code);
 });
 
@@ -129,9 +128,36 @@ if (m) {
 
 <footer class="site-footer">
   <div class="wrap">
-    <div class="footer-bottom" style="border-top:0;padding-top:0">
-      <span>&copy; 2026 STARFLEX. Tous droits r&eacute;serv&eacute;s.</span>
-      <span class="powered">Powered by <b>HaitiBiznis Technologies</b></span>
+    <div class="footer-grid">
+      <div>
+        <div class="logo-foot"><img src="assets/starflex-logo.png" alt="STARFLEX"></div>
+        <p class="tag" data-i18n="foot.tag">Des idées pour transformer et développer les générations futures.</p>
+      </div>
+      <div>
+        <h4 data-i18n="foot.platform">Plateforme</h4>
+        <a href="about.html" data-i18n="foot.about">À propos</a>
+        <a href="one-for-seven.html" data-i18n="foot.ofs">One For Seven</a>
+        <a href="civic-engagement.html" data-i18n="foot.civic">Engagement Civique</a>
+        <a href="portal.html" data-i18n="foot.citizen">Espace Citoyen</a>
+      </div>
+      <div>
+        <h4 data-i18n="foot.citizen">Espace Citoyen</h4>
+        <a href="register.html" data-i18n="foot.createacct">Créer un compte</a>
+        <a href="login.html" data-i18n="foot.signin">Se connecter</a>
+        <a href="certificate.html" data-i18n="foot.verifycert">Vérifier un certificat</a>
+        <a href="resources.html#faq" data-i18n="foot.faq">Questions fréquentes</a>
+      </div>
+      <div>
+        <h4 data-i18n="foot.contact">Contact</h4>
+        <a href="contact.html" data-i18n="foot.write">Nous écrire</a>
+        <a href="contact.html#whatsapp">WhatsApp</a>
+        <a href="https://myplopplop.com" target="_blank">MyPlopPlop</a>
+        <a href="https://haitibiznis.com" target="_blank">HaitiBiznis</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="foot.rights">&copy; 2026 STARFLEX. Tous droits r&eacute;serv&eacute;s.</span>
+      <span class="powered"><span data-i18n="foot.powered">Powered by</span> <b>HaitiBiznis Technologies</b></span>
     </div>
   </div>
 </footer>

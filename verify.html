@@ -27,6 +27,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/starflex.css">
+<link rel="stylesheet" href="assets/starflex-home.css">
 <link rel="stylesheet" href="assets/starflex-portal.css">
 <link rel="icon" href="assets/starflex-logo.png">
 </head>
@@ -35,15 +36,14 @@
 <header class="site-header">
   <div class="wrap nav">
     <a class="brand" href="index.html"><img src="assets/starflex-logo.png" alt="STARFLEX"></a>
-    <button class="burger" onclick="sfToggleNav()" aria-label="Menu">&#9776;</button>
+    <div class="lang-switch"></div>
+    <button class="burger" onclick="sfToggleNav()" data-i18n-title="nav.menu">&#9776;</button>
     <nav class="nav-links" id="navLinks">
-      <a href="index.html">Accueil</a>
-      <a href="about.html">&Agrave; propos</a>
-      <a href="one-for-seven.html">One For Seven</a>
-      <a href="civic-engagement.html">Engagement Civique</a>
-      <a href="resources.html">Ressources</a>
-      <a href="contact.html">Contact</a>
-      <a href="login.html" class="nav-cta">Se connecter</a>
+      <a href="index.html"><span class="ni">🏠</span><span data-i18n="nav.home">Accueil</span></a>
+      <a href="civic-engagement.html"><span class="ni">📚</span><span data-i18n="nav.learn">Apprendre</span></a>
+      <a href="one-for-seven.html"><span class="ni">🗳️</span><span data-i18n="nav.participate">Participer</span></a>
+      <a href="portal.html#certificat"><span class="ni">🏆</span><span data-i18n="nav.rewards">Récompenses</span></a>
+      <a href="portal.html" class="nav-cta"><span class="ni">👤</span><span data-i18n="nav.account">Mon compte</span></a>
     </nav>
   </div>
 </header>
@@ -52,13 +52,13 @@
   <div class="auth-card">
     <div class="auth-head">
       <img src="assets/starflex-logo.png" alt="STARFLEX">
-      <h1>Vérifiez votre compte</h1>
+      <h1 data-i18n="auth.otp_h1">Vérifiez votre compte</h1>
       <p id="sentTo">Saisissez le code à 6 chiffres que nous venons de vous envoyer.</p>
     </div>
 
     <!-- Shown only while no SMS/email provider is connected, so the flow stays testable. -->
     <div class="demo-code" id="demoCode" style="display:none">
-      Code de vérification (mode démonstration)
+      <span data-i18n="auth.otp_demo">Code de vérification (mode démonstration)</span>
       <b id="demoCodeVal"></b>
     </div>
 
@@ -73,16 +73,17 @@
         <input type="text" inputmode="numeric" maxlength="1" aria-label="Chiffre 5">
         <input type="text" inputmode="numeric" maxlength="1" aria-label="Chiffre 6">
       </div>
-      <button class="btn btn-orange btn-full" type="submit" id="submitBtn">Vérifier mon compte</button>
+      <button class="btn btn-orange btn-full" type="submit" id="submitBtn" data-i18n="auth.otp_btn">Vérifier mon compte</button>
     </form>
 
     <div class="auth-alt">
-      Vous n'avez rien reçu ? <a href="#" id="resendLink">Renvoyer le code</a><br>
-      <span style="font-size:13.5px">Le code expire au bout de 10 minutes.</span>
+      <span data-i18n="auth.otp_none">Vous n'avez rien reçu ?</span> <a href="#" id="resendLink" data-i18n="auth.otp_resend">Renvoyer le code</a><br>
+      <span style="font-size:13.5px" data-i18n="auth.otp_expire">Le code expire au bout de 10 minutes.</span>
     </div>
   </div>
 </div>
 
+<script src="assets/starflex-i18n.js"></script>
 <script src="assets/starflex-app.js"></script>
 <script>
 var pending = null;
@@ -94,10 +95,9 @@ if (!pending || !pending.citizen_id) {
 }
 
 if (pending) {
-  var where = pending.channel === 'email' ? 'par email' : 'par SMS';
   document.getElementById('sentTo').textContent =
-    'Nous avons envoyé un code à 6 chiffres ' + where +
-    (pending.contact ? ' à ' + pending.contact : '') + '.';
+    sfT(pending.channel === 'email' ? 'msg.sent_email' : 'msg.sent_sms') +
+    (pending.contact ? ' ' + sfT('msg.to') + ' ' + pending.contact : '') + '.';
   showDemoCode(pending.otp);
 }
 
@@ -130,11 +130,11 @@ boxes[0].focus();
 document.getElementById('otpForm').addEventListener('submit', function (e) {
   e.preventDefault();
   var code = boxes.map(function (b) { return b.value; }).join('');
-  if (code.length !== 6) return sfMsg('msg', 'Saisissez les 6 chiffres du code.');
+  if (code.length !== 6) return sfMsg('msg', sfT('msg.otp_6'));
 
   var btn = document.getElementById('submitBtn');
   sfMsg('msg', '');
-  sfBusy(btn, true, 'Vérification…');
+  sfBusy(btn, true, sfT('msg.verifying'));
 
   sfApi('/api/auth/verify-otp', { method: 'POST', body: { citizen_id: pending.citizen_id, code: code } })
     .then(function (res) {
@@ -155,7 +155,7 @@ document.getElementById('resendLink').addEventListener('click', function (e) {
   sfMsg('msg', '');
   sfApi('/api/auth/resend-otp', { method: 'POST', body: { citizen_id: pending.citizen_id } })
     .then(function (res) {
-      sfMsg('msg', 'Un nouveau code vient d\'être envoyé.', 'ok');
+      sfMsg('msg', sfT('msg.otp_resent'), 'ok');
       showDemoCode((res.data || {}).otp);
     })
     .catch(function (err) { sfMsg('msg', err.message); });
@@ -164,9 +164,36 @@ document.getElementById('resendLink').addEventListener('click', function (e) {
 
 <footer class="site-footer">
   <div class="wrap">
-    <div class="footer-bottom" style="border-top:0;padding-top:0">
-      <span>&copy; 2026 STARFLEX. Tous droits r&eacute;serv&eacute;s.</span>
-      <span class="powered">Powered by <b>HaitiBiznis Technologies</b></span>
+    <div class="footer-grid">
+      <div>
+        <div class="logo-foot"><img src="assets/starflex-logo.png" alt="STARFLEX"></div>
+        <p class="tag" data-i18n="foot.tag">Des idées pour transformer et développer les générations futures.</p>
+      </div>
+      <div>
+        <h4 data-i18n="foot.platform">Plateforme</h4>
+        <a href="about.html" data-i18n="foot.about">À propos</a>
+        <a href="one-for-seven.html" data-i18n="foot.ofs">One For Seven</a>
+        <a href="civic-engagement.html" data-i18n="foot.civic">Engagement Civique</a>
+        <a href="portal.html" data-i18n="foot.citizen">Espace Citoyen</a>
+      </div>
+      <div>
+        <h4 data-i18n="foot.citizen">Espace Citoyen</h4>
+        <a href="register.html" data-i18n="foot.createacct">Créer un compte</a>
+        <a href="login.html" data-i18n="foot.signin">Se connecter</a>
+        <a href="certificate.html" data-i18n="foot.verifycert">Vérifier un certificat</a>
+        <a href="resources.html#faq" data-i18n="foot.faq">Questions fréquentes</a>
+      </div>
+      <div>
+        <h4 data-i18n="foot.contact">Contact</h4>
+        <a href="contact.html" data-i18n="foot.write">Nous écrire</a>
+        <a href="contact.html#whatsapp">WhatsApp</a>
+        <a href="https://myplopplop.com" target="_blank">MyPlopPlop</a>
+        <a href="https://haitibiznis.com" target="_blank">HaitiBiznis</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="foot.rights">&copy; 2026 STARFLEX. Tous droits r&eacute;serv&eacute;s.</span>
+      <span class="powered"><span data-i18n="foot.powered">Powered by</span> <b>HaitiBiznis Technologies</b></span>
     </div>
   </div>
 </footer>

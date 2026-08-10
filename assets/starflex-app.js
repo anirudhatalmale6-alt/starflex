@@ -94,10 +94,15 @@ var SF_LEVELS = [
   { level: 'argent', min: 75,  label: 'Argent', next: 150 },
   { level: 'or',     min: 150, label: 'Or',     next: null }
 ];
+function sfLevelName(level) {
+  var key = 'lvl.' + String(level || '').toLowerCase();
+  var out = typeof sfT === 'function' ? sfT(key) : key;
+  return out === key ? level : out;
+}
 function sfNextLevel(points) {
-  if (points < 30)  return { label: 'Bronze', need: 30 - points,  target: 30 };
-  if (points < 75)  return { label: 'Argent', need: 75 - points,  target: 75 };
-  if (points < 150) return { label: 'Or',     need: 150 - points, target: 150 };
+  if (points < 30)  return { label: sfLevelName('bronze'), need: 30 - points,  target: 30 };
+  if (points < 75)  return { label: sfLevelName('argent'), need: 75 - points,  target: 75 };
+  if (points < 150) return { label: sfLevelName('or'),     need: 150 - points, target: 150 };
   return null;
 }
 

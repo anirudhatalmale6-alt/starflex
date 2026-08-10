@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STARFLEX — Plateforme Nationale de Citoyenneté Active</title>
-<meta name="description" content="STARFLEX : la plateforme numérique nationale d'éducation civique, de participation citoyenne et d'inclusion sociale en Haïti. Programme One For Seven (1 pour 7).">
-<meta property="og:title" content="STARFLEX — Plateforme Nationale de Citoyenneté Active">
-<meta property="og:description" content="Un geste citoyen pour sept avantages sociaux. Éducation civique, consultations publiques et engagement citoyen en Haïti.">
+<title>STARFLEX — Apprends, Participe, Gagne, Fais évoluer Haïti</title>
+<meta name="description" content="STARFLEX récompense les citoyens qui apprennent, participent et améliorent leur communauté. Éducation civique, consultations publiques et Certificat National de Participation Citoyenne en Haïti.">
+<meta property="og:title" content="STARFLEX — Apprends, Participe, Gagne, Fais évoluer Haïti">
+<meta property="og:description" content="STARFLEX récompense les citoyens qui apprennent, participent et améliorent leur communauté.">
 <meta property="og:image" content="https://starflexone.com/assets/og-starflex.jpg?v=1">
 <meta property="og:image:secure_url" content="https://starflexone.com/assets/og-starflex.jpg?v=1">
 <meta property="og:image:type" content="image/jpeg">
@@ -18,200 +18,309 @@
 <meta property="og:site_name" content="STARFLEX">
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="STARFLEX — Plateforme Nationale de Citoyenneté Active">
-<meta name="twitter:description" content="Un geste citoyen pour sept avantages sociaux. Éducation civique, consultations publiques et engagement citoyen en Haïti.">
+<meta name="twitter:title" content="STARFLEX — Apprends, Participe, Gagne, Fais évoluer Haïti">
+<meta name="twitter:description" content="STARFLEX récompense les citoyens qui apprennent, participent et améliorent leur communauté.">
 <meta name="twitter:image" content="https://starflexone.com/assets/og-starflex.jpg?v=1">
 <link rel="canonical" href="https://starflexone.com/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/starflex.css">
+<link rel="stylesheet" href="assets/starflex-home.css">
 <link rel="icon" href="assets/starflex-logo.png">
 </head>
 <body>
+<span data-i18n-doctitle="home.title" hidden></span>
 
 <header class="site-header">
   <div class="wrap nav">
     <a class="brand" href="index.html"><img src="assets/starflex-logo.png" alt="STARFLEX"></a>
-    <button class="burger" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Menu">☰</button>
+    <div class="lang-switch"></div>
+    <button class="burger" onclick="sfToggleNav()" data-i18n-title="nav.menu">&#9776;</button>
     <nav class="nav-links" id="navLinks">
-      <a href="index.html" class="active">Accueil</a>
-      <a href="about.html">À propos</a>
-      <a href="one-for-seven.html">One For Seven</a>
-      <a href="civic-engagement.html">Engagement Civique</a>
-      <a href="resources.html">Ressources</a>
-      <a href="contact.html">Contact</a>
-      <a href="portal.html" class="nav-cta">Espace Citoyen</a>
+      <a href="index.html" class="active"><span class="ni">🏠</span><span data-i18n="nav.home">Accueil</span></a>
+      <a href="civic-engagement.html"><span class="ni">📚</span><span data-i18n="nav.learn">Apprendre</span></a>
+      <a href="one-for-seven.html"><span class="ni">🗳️</span><span data-i18n="nav.participate">Participer</span></a>
+      <a href="portal.html#certificat"><span class="ni">🏆</span><span data-i18n="nav.rewards">Récompenses</span></a>
+      <a href="portal.html" class="nav-cta"><span class="ni">👤</span><span data-i18n="nav.account">Mon compte</span></a>
     </nav>
   </div>
 </header>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="wrap hero-grid">
+<!-- ══ HERO ══ -->
+<section class="h2-hero">
+  <div class="wrap">
     <div>
-      <span class="eyebrow">PROJET NATIONAL DE CITOYENNETÉ ACTIVE</span>
-      <h1>Un geste citoyen pour <em>sept avantages sociaux</em></h1>
-      <p class="lead">STARFLEX est la plateforme numérique nationale qui renforce la participation citoyenne, l'éducation civique et l'inclusion sociale en Haïti. Informez-vous, formez-vous, participez — et faites reconnaître votre engagement.</p>
-      <div class="hero-actions">
-        <a class="btn btn-orange" href="portal.html">Devenir citoyen actif</a>
-        <a class="btn btn-ghost" href="one-for-seven.html">Découvrir One For Seven</a>
+      <span class="h2-badge" data-i18n="home.welcome">🇭🇹 Bienvenue sur STARFLEX</span>
+      <h1>
+        <span data-i18n="home.h1a">Apprends</span>
+        <span data-i18n="home.h1b">Participe</span>
+        <span class="o" data-i18n="home.h1c">Gagne</span>
+        <span data-i18n="home.h1d">Fais évoluer Haïti</span>
+      </h1>
+      <p class="one" data-i18n="home.sub">STARFLEX récompense les citoyens qui apprennent, participent et améliorent leur communauté.</p>
+      <div class="h2-actions">
+        <a class="btn btn-orange btn-xl" href="register.html"><span data-i18n="home.cta1">Je Commence</span></a>
+        <a class="btn btn-outline-blue btn-xl" href="#video">▶ <span data-i18n="home.cta2">Voir la vidéo (2 min)</span></a>
       </div>
     </div>
-    <div class="hero-card">
-      <h3>La plateforme en bref</h3>
-      <div class="hero-stat"><b>7</b><span>avantages sociaux liés à l'engagement citoyen</span></div>
-      <div class="hero-stat"><b>24</b><span>mois de déploiement national</span></div>
-      <div class="hero-stat"><b>10</b><span>départements couverts à terme</span></div>
-      <div class="hero-stat"><b>100%</b><span>accessible sur mobile et web</span></div>
+
+    <!-- Original illustration: three young citizens with a book, a ballot and a certificate. -->
+    <div class="h2-illus">
+      <svg viewBox="0 0 520 420" role="img" aria-label="Jeunes Haïtiens souriants" data-i18n-title="home.illus_alt">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#eaf3fb"/><stop offset="1" stop-color="#f7fbff"/>
+          </linearGradient>
+        </defs>
+
+        <!-- backdrop + sunburst echoing the logo -->
+        <rect x="14" y="18" width="492" height="368" rx="52" fill="url(#sky)"/>
+        <g stroke="#e8963a" stroke-width="7" stroke-linecap="round" opacity=".55">
+          <line x1="260" y1="52" x2="260" y2="82"/>
+          <line x1="198" y1="66" x2="212" y2="93"/>
+          <line x1="322" y1="66" x2="308" y2="93"/>
+          <line x1="152" y1="106" x2="178" y2="122"/>
+          <line x1="368" y1="106" x2="342" y2="122"/>
+        </g>
+        <circle cx="260" cy="128" r="26" fill="#e8963a" opacity=".22"/>
+
+        <!-- ground -->
+        <ellipse cx="260" cy="352" rx="196" ry="20" fill="#dce8f3"/>
+
+        <!-- ░ figure 1 — holding a book ░ -->
+        <g class="h2-float">
+          <rect x="104" y="286" width="20" height="60" rx="10" fill="#254a63"/>
+          <rect x="134" y="286" width="20" height="60" rx="10" fill="#254a63"/>
+          <rect x="98" y="192" width="62" height="104" rx="27" fill="#1c6fb0"/>
+          <rect x="86" y="206" width="17" height="62" rx="8.5" fill="#8d5524" transform="rotate(9 94 237)"/>
+          <rect x="155" y="206" width="17" height="62" rx="8.5" fill="#8d5524" transform="rotate(-9 163 237)"/>
+          <circle cx="129" cy="160" r="31" fill="#8d5524"/>
+          <path d="M98 154c2-22 16-33 31-33s29 11 31 33c-8-9-18-13-31-13s-23 4-31 13z" fill="#2b1a12"/>
+          <circle cx="119" cy="160" r="3.4" fill="#231309"/><circle cx="139" cy="160" r="3.4" fill="#231309"/>
+          <path d="M119 172q10 9 20 0" stroke="#231309" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+          <g transform="rotate(-8 129 250)">
+            <rect x="100" y="234" width="58" height="42" rx="5" fill="#fff" stroke="#cfe0f0" stroke-width="2.5"/>
+            <line x1="129" y1="236" x2="129" y2="274" stroke="#cfe0f0" stroke-width="2.5"/>
+            <line x1="108" y1="248" x2="122" y2="248" stroke="#e3e8ef" stroke-width="3"/>
+            <line x1="136" y1="248" x2="150" y2="248" stroke="#e3e8ef" stroke-width="3"/>
+          </g>
+        </g>
+
+        <!-- ░ figure 2 — raising a star ░ -->
+        <g class="h2-float d1">
+          <rect x="235" y="292" width="21" height="58" rx="10.5" fill="#254a63"/>
+          <rect x="266" y="292" width="21" height="58" rx="10.5" fill="#254a63"/>
+          <rect x="228" y="194" width="66" height="110" rx="29" fill="#e8963a"/>
+          <rect x="215" y="150" width="17" height="70" rx="8.5" fill="#c68642" transform="rotate(20 223 185)"/>
+          <rect x="290" y="210" width="17" height="64" rx="8.5" fill="#c68642" transform="rotate(-10 298 242)"/>
+          <circle cx="261" cy="158" r="33" fill="#c68642"/>
+          <path d="M228 152c3-24 17-35 33-35s30 11 33 35c-6-11-17-16-33-16s-27 5-33 16z" fill="#3a2417"/>
+          <circle cx="250" cy="158" r="3.6" fill="#231309"/><circle cx="272" cy="158" r="3.6" fill="#231309"/>
+          <path d="M249 171q12 11 24 0" stroke="#231309" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+          <path d="M206 128l5.6 11.4 12.6 1.8-9.1 8.9 2.2 12.5-11.3-5.9-11.3 5.9 2.2-12.5-9.1-8.9 12.6-1.8z" fill="#f0b45f"/>
+        </g>
+
+        <!-- ░ figure 3 — holding a certificate ░ -->
+        <g class="h2-float d2">
+          <rect x="366" y="288" width="20" height="60" rx="10" fill="#254a63"/>
+          <rect x="396" y="288" width="20" height="60" rx="10" fill="#254a63"/>
+          <rect x="360" y="196" width="62" height="102" rx="27" fill="#12507f"/>
+          <rect x="348" y="210" width="17" height="60" rx="8.5" fill="#5c3a21" transform="rotate(10 356 240)"/>
+          <rect x="417" y="210" width="17" height="60" rx="8.5" fill="#5c3a21" transform="rotate(-10 425 240)"/>
+          <circle cx="391" cy="164" r="30" fill="#5c3a21"/>
+          <path d="M361 160c2-21 15-32 30-32s28 11 30 32c-7-9-17-13-30-13s-23 4-30 13z" fill="#241610"/>
+          <circle cx="382" cy="164" r="3.3" fill="#150c07"/><circle cx="400" cy="164" r="3.3" fill="#150c07"/>
+          <path d="M382 176q9 8 18 0" stroke="#150c07" stroke-width="3.1" fill="none" stroke-linecap="round"/>
+          <g transform="rotate(7 391 250)">
+            <rect x="362" y="232" width="58" height="40" rx="5" fill="#fff" stroke="#e8963a" stroke-width="2.5"/>
+            <line x1="372" y1="244" x2="410" y2="244" stroke="#e3e8ef" stroke-width="3"/>
+            <line x1="372" y1="253" x2="400" y2="253" stroke="#e3e8ef" stroke-width="3"/>
+            <circle cx="404" cy="262" r="7" fill="#e8963a"/>
+          </g>
+        </g>
+
+        <!-- floating reward chips -->
+        <g class="h2-float d1">
+          <circle cx="76" cy="108" r="25" fill="#fff" stroke="#e3e8ef" stroke-width="2"/>
+          <text x="76" y="118" font-size="24" text-anchor="middle">📚</text>
+        </g>
+        <g class="h2-float d2">
+          <circle cx="446" cy="132" r="25" fill="#fff" stroke="#e3e8ef" stroke-width="2"/>
+          <text x="446" y="142" font-size="24" text-anchor="middle">🏆</text>
+        </g>
+        <g class="h2-float">
+          <circle cx="452" cy="290" r="24" fill="#fff" stroke="#e3e8ef" stroke-width="2"/>
+          <text x="452" y="299" font-size="23" text-anchor="middle">🗳️</text>
+        </g>
+      </svg>
     </div>
   </div>
-</div>
+</section>
 
-<!-- MISSION -->
-<section>
+<!-- ══ HOW IT WORKS ══ -->
+<section class="h2-sec tint">
   <div class="wrap">
-    <div class="section-head">
-      <div class="kicker">Notre Mission</div>
-      <h2>Rétablir le lien entre le citoyen et l'État grâce au numérique</h2>
-      <p>Face à la baisse de la participation électorale et à la méfiance envers les institutions, STARFLEX propose une réponse concrète : informer, former et valoriser chaque citoyen engagé.</p>
+    <div class="h2-head rv"><h2 data-i18n="home.how">Comment ça marche ?</h2></div>
+    <div class="h2-steps">
+      <div class="h2-step rv"><span class="n">1</span><span class="em">📚</span>
+        <h3 data-i18n="home.how1">J'apprends</h3><p data-i18n="home.how1s">Des leçons courtes sur tes droits et tes institutions.</p></div>
+      <div class="h2-step rv"><span class="n">2</span><span class="em">🗳️</span>
+        <h3 data-i18n="home.how2">Je participe</h3><p data-i18n="home.how2s">Tu donnes ton avis dans les consultations publiques.</p></div>
+      <div class="h2-step rv"><span class="n">3</span><span class="em">⭐</span>
+        <h3 data-i18n="home.how3">Je gagne des points</h3><p data-i18n="home.how3s">Chaque action citoyenne te rapporte des points.</p></div>
+      <div class="h2-step rv"><span class="n">4</span><span class="em">🏆</span>
+        <h3 data-i18n="home.how4">Je reçois mon certificat</h3><p data-i18n="home.how4s">Ton engagement devient un certificat national.</p></div>
     </div>
-    <div class="grid grid-3">
-      <div class="card">
-        <div class="ico">📚</div>
-        <h3>Éduquer</h3>
-        <p>Des formations civiques interactives et accessibles à tous, pour comprendre ses droits, ses devoirs et le fonctionnement des institutions.</p>
-      </div>
-      <div class="card orange">
-        <div class="ico">🗳️</div>
-        <h3>Mobiliser</h3>
-        <p>Des informations personnalisées et des rappels sur les échéances électorales, pour que personne ne reste à l'écart de la vie démocratique.</p>
-      </div>
-      <div class="card">
-        <div class="ico">🤝</div>
-        <h3>Valoriser</h3>
-        <p>Un Certificat National de Participation Citoyenne qui reconnaît l'engagement et ouvre l'accès à des avantages sociaux définis par les politiques publiques.</p>
+  </div>
+</section>
+
+<!-- ══ WHY ══ -->
+<section class="h2-sec">
+  <div class="wrap">
+    <div class="h2-head rv"><h2 data-i18n="home.why">Pourquoi STARFLEX ?</h2></div>
+    <div class="h2-why">
+      <div class="h2-card rv" style="--c:#1c6fb0"><span class="em">📚</span>
+        <h3 data-i18n="home.why1">Éducation</h3><p data-i18n="home.why1s">Comprendre ses droits et ses devoirs, simplement.</p></div>
+      <div class="h2-card rv" style="--c:#e8963a"><span class="em">🗳️</span>
+        <h3 data-i18n="home.why2">Participation</h3><p data-i18n="home.why2s">Ta voix compte dans les décisions publiques.</p></div>
+      <div class="h2-card rv" style="--c:#12a06a"><span class="em">🤝</span>
+        <h3 data-i18n="home.why3">Volontariat</h3><p data-i18n="home.why3s">Agir près de chez toi, avec les autres.</p></div>
+      <div class="h2-card rv" style="--c:#0d3a5c"><span class="em">🏛️</span>
+        <h3 data-i18n="home.why4">Institutions</h3><p data-i18n="home.why4s">Un pont direct entre le citoyen et l'État.</p></div>
+      <div class="h2-card rv" style="--c:#7a5bd0"><span class="em">🎓</span>
+        <h3 data-i18n="home.why5">Opportunités</h3><p data-i18n="home.why5s">Formation, réseau et reconnaissance.</p></div>
+      <div class="h2-card rv" style="--c:#d4a017"><span class="em">🏆</span>
+        <h3 data-i18n="home.why6">Certificat</h3><p data-i18n="home.why6s">Une preuve officielle de ton engagement.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ JOURNEY ══ -->
+<section class="h2-sec tint">
+  <div class="wrap">
+    <div class="h2-head rv">
+      <h2 data-i18n="home.journey">Le parcours citoyen</h2>
+      <p data-i18n="home.journeys">Six étapes, du premier clic jusqu'aux avantages.</p>
+    </div>
+    <div class="h2-time" id="timeline">
+      <div class="h2-tstep rv"><div class="dot">👤</div><h3 data-i18n="home.j1">Créer mon compte</h3></div>
+      <div class="h2-tstep rv"><div class="dot">📚</div><h3 data-i18n="home.j2">Suivre les leçons</h3></div>
+      <div class="h2-tstep rv"><div class="dot">🗳️</div><h3 data-i18n="home.j3">Participer</h3></div>
+      <div class="h2-tstep rv"><div class="dot">⭐</div><h3 data-i18n="home.j4">Gagner des points</h3></div>
+      <div class="h2-tstep rv"><div class="dot">🏆</div><h3 data-i18n="home.j5">Recevoir le certificat</h3></div>
+      <div class="h2-tstep rv"><div class="dot">🎁</div><h3 data-i18n="home.j6">Débloquer les avantages</h3></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BENEFITS ══ -->
+<section class="h2-sec">
+  <div class="wrap">
+    <div class="h2-head rv">
+      <h2 data-i18n="home.benefits">Les avantages</h2>
+      <p data-i18n="home.benefitss">Ce que l'engagement citoyen ouvre concrètement.</p>
+    </div>
+    <div class="h2-bens">
+      <div class="h2-ben rv"><div class="ring" style="--bgc:#e7f4ee">🏥</div><h3 data-i18n="home.b1">Santé</h3></div>
+      <div class="h2-ben rv"><div class="ring" style="--bgc:#eef4fa">🎓</div><h3 data-i18n="home.b2">Éducation</h3></div>
+      <div class="h2-ben rv"><div class="ring" style="--bgc:#fdf1e3">💼</div><h3 data-i18n="home.b3">Emploi</h3></div>
+      <div class="h2-ben rv"><div class="ring" style="--bgc:#f0edfb">💳</div><h3 data-i18n="home.b4">Inclusion financière</h3></div>
+      <div class="h2-ben rv"><div class="ring" style="--bgc:#e7f4ee">🤝</div><h3 data-i18n="home.b5">Communauté</h3></div>
+      <div class="h2-ben rv"><div class="ring" style="--bgc:#fdf1e3">🎁</div><h3 data-i18n="home.b6">Récompenses</h3></div>
+      <div class="h2-ben rv"><div class="ring" style="--bgc:#fbf3dc">🏆</div><h3 data-i18n="home.b7">Reconnaissance</h3></div>
+      <div class="h2-ben rv" style="background:linear-gradient(135deg,var(--blue-ink),var(--blue));border:0">
+        <div class="ring" style="--bgc:rgba(255,255,255,.16)">🇭🇹</div>
+        <h3 style="color:#fff">One For Seven</h3></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PHONE PREVIEW ══ -->
+<section class="h2-sec tint">
+  <div class="wrap h2-phone-sec">
+    <div class="rv">
+      <h2 data-i18n="home.preview">Ton espace citoyen</h2>
+      <p data-i18n="home.previews">Tout tient dans ton téléphone : tes points, ton niveau, tes leçons et tes votes.</p>
+      <a class="btn btn-blue btn-xl" href="portal.html"><span data-i18n="home.pv_open">Ouvrir mon espace</span></a>
+    </div>
+    <div class="rv">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="phone-notch"></div>
+          <div class="pv-top">
+            <div class="hi" data-i18n="home.pv_hi">Bonjour Jean</div>
+            <div class="pts">⭐ 240</div>
+            <span class="lvl" data-i18n="home.pv_lvl">Niveau Citoyen</span>
+          </div>
+          <div class="pv-row"><span class="e">📚</span>
+            <div class="t"><span data-i18n="home.pv_lesson">Leçon 4</span><span class="bar"><i></i></span></div></div>
+          <div class="pv-row"><span class="e">🔔</span><div class="t" data-i18n="home.pv_survey">Nouveau sondage</div></div>
+          <div class="pv-row"><span class="e">🏆</span><div class="t" data-i18n="home.pv_pts">Points</div><b style="color:var(--orange)">240</b></div>
+          <div class="pv-cta" data-i18n="home.pv_vote">🗳 Voter maintenant</div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- VIDEO -->
-<section class="alt">
-  <div class="wrap split">
-    <div>
-      <div class="kicker" style="color:var(--orange);font-weight:800;font-size:13px;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:10px">Vidéo de présentation</div>
-      <h2>Comprendre STARFLEX en 3 minutes</h2>
-      <p>Découvrez comment la plateforme fonctionne, ce que le programme One For Seven apporte concrètement aux citoyens, et comment votre participation est reconnue et récompensée.</p>
-      <ul class="checklist">
-        <li>Une application mobile et web sécurisée, accessible partout</li>
-        <li>Un parcours simple : s'inscrire, se former, participer</li>
-        <li>Un certificat officiel qui valorise votre engagement</li>
-      </ul>
-      <a class="btn btn-blue mt-24" href="about.html">En savoir plus sur le projet</a>
+<!-- ══ GOALS (counters) ══ -->
+<section class="h2-sec">
+  <div class="wrap">
+    <div class="h2-head rv">
+      <h2 data-i18n="home.goals">Nos objectifs</h2>
+      <p data-i18n="home.goalss">Les cibles que le programme vise pour sa première phase nationale.</p>
     </div>
-    <div class="media-box">
-      <div>
+    <div class="h2-stats" id="stats">
+      <div class="h2-stat rv"><span class="em">👥</span><b data-count="12540">0</b><span data-i18n="home.g1">Citoyens</span></div>
+      <div class="h2-stat rv"><span class="em">📚</span><b data-count="35">0</b><span data-i18n="home.g2">Formations</span></div>
+      <div class="h2-stat rv"><span class="em">🗳️</span><b data-count="420">0</b><span data-i18n="home.g3">Consultations</span></div>
+      <div class="h2-stat rv"><span class="em">🤝</span><b data-count="185">0</b><span data-i18n="home.g4">Communautés</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ VIDEO ══ -->
+<section class="h2-sec tint" id="video">
+  <div class="wrap">
+    <div class="h2-head rv">
+      <h2 data-i18n="home.video">STARFLEX en 2 minutes</h2>
+      <p data-i18n="home.videos">Comprendre la plateforme et le programme One For Seven.</p>
+    </div>
+    <div class="h2-video rv">
+      <div class="inner">
         <div class="play">▶</div>
-        <p>La vidéo de présentation sera disponible ici</p>
+        <div class="cap" data-i18n="home.video_soon">La vidéo de présentation arrive bientôt</div>
       </div>
+      <span class="len">2:00</span>
     </div>
   </div>
 </section>
 
-<!-- WHY -->
-<section>
+<!-- ══ PARTNERS ══ -->
+<section class="h2-sec">
   <div class="wrap">
-    <div class="section-head">
-      <div class="kicker">Pourquoi STARFLEX ?</div>
-      <h2>Une première nationale au service de la démocratie participative</h2>
-    </div>
-    <div class="grid grid-4">
-      <div class="card">
-        <div class="step-num">1</div>
-        <h3>Accessible à tous</h3>
-        <p>Disponible sur Android, iOS et web, pensé pour fonctionner même avec une connexion limitée.</p>
-      </div>
-      <div class="card orange">
-        <div class="step-num">2</div>
-        <h3>Sécurisé</h3>
-        <p>Vos données personnelles sont protégées et votre identité vérifiée par un système d'authentification sécurisé.</p>
-      </div>
-      <div class="card">
-        <div class="step-num">3</div>
-        <h3>Reconnu</h3>
-        <p>Le Certificat National de Participation Citoyenne atteste officiellement de votre engagement.</p>
-      </div>
-      <div class="card orange">
-        <div class="step-num">4</div>
-        <h3>Utile</h3>
-        <p>L'engagement citoyen ouvre l'accès à des avantages sociaux concrets définis par les politiques publiques.</p>
-      </div>
+    <div class="h2-head rv"><h2 data-i18n="home.partners">Nos partenaires</h2></div>
+  </div>
+  <div class="h2-marquee">
+    <div class="h2-track" id="track">
+      <div class="h2-plogo"><span class="em">🏛️</span><span data-i18n="home.p1">Gouvernement</span></div>
+      <div class="h2-plogo"><span class="em">🎓</span><span data-i18n="home.p2">Universités</span></div>
+      <div class="h2-plogo"><span class="em">🌍</span><span data-i18n="home.p3">ONG</span></div>
+      <div class="h2-plogo"><span class="em">💼</span><span data-i18n="home.p4">Secteur privé</span></div>
+      <div class="h2-plogo"><span class="em">🗳️</span><span data-i18n="home.p6">Organismes électoraux</span></div>
+      <div class="h2-plogo"><span class="em">💡</span><span data-i18n="home.p5">HaitiBiznis Technologies</span></div>
     </div>
   </div>
 </section>
 
-<!-- NEWS -->
-<section class="alt">
+<!-- ══ FINAL CTA ══ -->
+<section class="h2-sec tint">
   <div class="wrap">
-    <div class="section-head">
-      <div class="kicker">Actualités</div>
-      <h2>Les dernières nouvelles de la plateforme</h2>
-    </div>
-    <div class="grid grid-3">
-      <article class="news-card">
-        <div class="news-thumb">🚀</div>
-        <div class="news-body">
-          <div class="news-date">Prochainement</div>
-          <h3>Lancement du projet pilote One For Seven</h3>
-          <p>La phase pilote permettra de tester la plateforme auprès des premiers citoyens inscrits avant le déploiement national.</p>
-        </div>
-      </article>
-      <article class="news-card o">
-        <div class="news-thumb">🎓</div>
-        <div class="news-body">
-          <div class="news-date">Prochainement</div>
-          <h3>Premiers modules d'éducation civique</h3>
-          <p>Des formations interactives sur les institutions, le processus électoral et les droits fondamentaux.</p>
-        </div>
-      </article>
-      <article class="news-card">
-        <div class="news-thumb">🤝</div>
-        <div class="news-body">
-          <div class="news-date">Prochainement</div>
-          <h3>Appel à partenaires institutionnels</h3>
-          <p>STARFLEX invite les institutions, ONG et partenaires du développement à rejoindre le programme.</p>
-        </div>
-      </article>
-    </div>
-    <div class="center mt-24"><a class="btn btn-blue" href="resources.html">Toutes les actualités</a></div>
-  </div>
-</section>
-
-<!-- PARTNERS -->
-<section>
-  <div class="wrap">
-    <div class="section-head">
-      <div class="kicker">Partenaires</div>
-      <h2>Un projet construit avec l'écosystème national</h2>
-      <p>STARFLEX travaille avec les institutions civiques, les organismes électoraux, les ONG et les partenaires du développement.</p>
-    </div>
-    <div class="grid grid-4">
-      <div class="partner"><div class="p-ico">🏛️</div>Institutions civiques</div>
-      <div class="partner"><div class="p-ico">🗳️</div>Organismes électoraux</div>
-      <div class="partner"><div class="p-ico">🌍</div>ONG &amp; développement</div>
-      <div class="partner"><div class="p-ico">💡</div>HaitiBiznis Technologies</div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="alt">
-  <div class="wrap">
-    <div class="cta-band">
-      <h2>Votre engagement compte. Faites-le reconnaître.</h2>
-      <p>Rejoignez STARFLEX, formez-vous, participez aux consultations publiques et obtenez votre Certificat National de Participation Citoyenne.</p>
-      <a class="btn btn-orange" href="portal.html">Créer mon compte citoyen</a>
+    <div class="h2-final rv">
+      <h2 data-i18n="home.final">Prêt à devenir un citoyen actif ?</h2>
+      <p data-i18n="home.finals">Crée ton compte en deux minutes et commence à gagner des points dès aujourd'hui.</p>
+      <a class="btn btn-orange btn-xl" href="register.html" data-i18n="home.finalcta">Créer mon compte</a>
     </div>
   </div>
 </section>
@@ -221,36 +330,91 @@
     <div class="footer-grid">
       <div>
         <div class="logo-foot"><img src="assets/starflex-logo.png" alt="STARFLEX"></div>
-        <p class="tag">Des idées pour transformer et développer les générations futures.</p>
+        <p class="tag" data-i18n="foot.tag">Des idées pour transformer et développer les générations futures.</p>
       </div>
       <div>
-        <h4>Plateforme</h4>
-        <a href="about.html">À propos</a>
-        <a href="one-for-seven.html">One For Seven</a>
-        <a href="civic-engagement.html">Engagement Civique</a>
-        <a href="portal.html">Espace Citoyen</a>
+        <h4 data-i18n="foot.platform">Plateforme</h4>
+        <a href="about.html" data-i18n="foot.about">À propos</a>
+        <a href="one-for-seven.html" data-i18n="foot.ofs">One For Seven</a>
+        <a href="civic-engagement.html" data-i18n="foot.civic">Engagement Civique</a>
+        <a href="portal.html" data-i18n="foot.citizen">Espace Citoyen</a>
       </div>
       <div>
-        <h4>Ressources</h4>
-        <a href="resources.html">Actualités</a>
-        <a href="resources.html#faq">Questions fréquentes</a>
-        <a href="resources.html#events">Événements</a>
-        <a href="resources.html#downloads">Téléchargements</a>
+        <h4 data-i18n="foot.citizen">Espace Citoyen</h4>
+        <a href="register.html" data-i18n="foot.createacct">Créer un compte</a>
+        <a href="login.html" data-i18n="foot.signin">Se connecter</a>
+        <a href="certificate.html" data-i18n="foot.verifycert">Vérifier un certificat</a>
+        <a href="resources.html#faq" data-i18n="foot.faq">Questions fréquentes</a>
       </div>
       <div>
-        <h4>Contact</h4>
-        <a href="contact.html">Nous écrire</a>
+        <h4 data-i18n="foot.contact">Contact</h4>
+        <a href="contact.html" data-i18n="foot.write">Nous écrire</a>
         <a href="contact.html#whatsapp">WhatsApp</a>
         <a href="https://myplopplop.com" target="_blank">MyPlopPlop</a>
         <a href="https://haitibiznis.com" target="_blank">HaitiBiznis</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 STARFLEX. Tous droits réservés.</span>
-      <span class="powered">Powered by <b>HaitiBiznis Technologies</b></span>
+      <span data-i18n="foot.rights">&copy; 2026 STARFLEX. Tous droits r&eacute;serv&eacute;s.</span>
+      <span class="powered"><span data-i18n="foot.powered">Powered by</span> <b>HaitiBiznis Technologies</b></span>
     </div>
   </div>
 </footer>
+
+<script src="assets/starflex-i18n.js"></script>
+<script src="assets/starflex-app.js"></script>
+<script>
+/* Reveal blocks as they enter the viewport, and let the timeline draw itself. */
+var io = new IntersectionObserver(function (entries) {
+  entries.forEach(function (e) {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in');
+    if (e.target.id === 'stats') runCounters();
+    io.unobserve(e.target);
+  });
+}, { threshold: 0.18 });
+
+document.querySelectorAll('.rv').forEach(function (el, i) {
+  el.style.transitionDelay = (i % 4) * 90 + 'ms';
+  io.observe(el);
+});
+['timeline', 'stats'].forEach(function (id) {
+  var el = document.getElementById(id);
+  if (el) io.observe(el);
+});
+
+/* Counters animate once, when the section is first seen. */
+var counted = false;
+function runCounters() {
+  if (counted) return;
+  counted = true;
+  document.querySelectorAll('[data-count]').forEach(function (el) {
+    var target = parseInt(el.getAttribute('data-count'), 10);
+    var start = null, dur = 1600;
+    function step(ts) {
+      if (!start) start = ts;
+      var p = Math.min(1, (ts - start) / dur);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased).toLocaleString('fr-FR');
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+/* The marquee needs its items duplicated so the loop is seamless. */
+(function () {
+  var t = document.getElementById('track');
+  if (t) t.innerHTML += t.innerHTML;
+})();
+
+/* Someone already signed in goes straight to their space. */
+(function () {
+  if (typeof sfToken === 'function' && sfToken()) {
+    document.querySelectorAll('a[href="register.html"]').forEach(function (a) { a.href = 'dashboard.html'; });
+  }
+})();
+</script>
 
 </body>
 </html>

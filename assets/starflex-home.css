@@ -273,14 +273,39 @@
 .h2-herologo{height:86px;width:auto;margin-bottom:22px}
 @media(max-width:940px){.h2-herologo{height:64px;margin-bottom:16px}}
 
-/* Portrait stage is for SELF-HOSTED vertical clips only — a <video> element we can
-   letterbox ourselves. YouTube embeds always stay 16:9 (see openVideo): forcing a
-   9:16 iframe makes the player scale to fill and crop the sides. */
-.v-modal.portrait .v-box{max-width:420px}
-.v-modal.portrait .v-frame{aspect-ratio:9/16}
+/* ── Vertical clips ───────────────────────────────────────────────────────
+   YouTube always draws a 16:9 canvas and letterboxes a vertical video inside it,
+   so the video occupies (9/16) of the canvas width. To make that video fill a
+   9:16 window we scale the canvas up by (16/9)² = 3.1605 and centre it, clipping
+   the empty sides. Result: full frame, nothing cropped, no black bars.
+   Getting this wrong in either direction is what cut the branded text earlier —
+   never simply set the iframe itself to 9/16. */
+.v-modal.portrait .v-box{max-width:400px}
+.v-modal.portrait .v-frame{aspect-ratio:9/16;overflow:hidden}
+.v-modal.portrait .v-frame iframe{
+  inset:0 auto 0 50%;
+  height:100%;
+  width:316.05%;            /* (16/9)² of the container width */
+  transform:translateX(-50%);
+}
+/* A self-hosted file needs none of that — we control the element directly. */
+.v-modal.portrait .v-frame video{width:100%;height:100%;object-fit:cover}
 .v-frame video{object-fit:contain;background:#000}
-/* A vertical clip inside the 16:9 stage is small on a phone — use the full width. */
+
+/* Keep the tall player inside the viewport on short screens. */
+@media(max-height:820px){
+  .v-modal.portrait .v-box{max-width:min(400px, calc((100vh - 96px) * 0.5625))}
+}
 @media(max-width:760px){
   .v-modal{padding:14px}
   .v-close{top:-40px}
+}
+
+/* Logo centred in the hero on phones, as requested; on desktop it stays aligned
+   with the headline column it belongs to. */
+@media(max-width:940px){
+  .h2-herologo{display:block;margin-left:auto;margin-right:auto}
+  .h2-hero .wrap > div:first-child{text-align:center}
+  .h2-hero p.one{margin-left:auto;margin-right:auto}
+  .h2-actions{justify-content:center}
 }

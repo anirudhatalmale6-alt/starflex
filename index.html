@@ -7,8 +7,8 @@
 <meta name="description" content="STARFLEX récompense les citoyens qui apprennent, participent et améliorent leur communauté. Éducation civique, consultations publiques et Certificat National de Participation Citoyenne en Haïti.">
 <meta property="og:title" content="STARFLEX — Apprends, Participe, Gagne, Fais évoluer Haïti">
 <meta property="og:description" content="STARFLEX récompense les citoyens qui apprennent, participent et améliorent leur communauté.">
-<meta property="og:image" content="https://starflexone.com/assets/og-starflex.jpg?v=1">
-<meta property="og:image:secure_url" content="https://starflexone.com/assets/og-starflex.jpg?v=1">
+<meta property="og:image" content="https://starflexone.com/assets/og-starflex.jpg?v=2">
+<meta property="og:image:secure_url" content="https://starflexone.com/assets/og-starflex.jpg?v=2">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -20,7 +20,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="STARFLEX — Apprends, Participe, Gagne, Fais évoluer Haïti">
 <meta name="twitter:description" content="STARFLEX récompense les citoyens qui apprennent, participent et améliorent leur communauté.">
-<meta name="twitter:image" content="https://starflexone.com/assets/og-starflex.jpg?v=1">
+<meta name="twitter:image" content="https://starflexone.com/assets/og-starflex.jpg?v=2">
 <link rel="canonical" href="https://starflexone.com/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -441,11 +441,11 @@ function renderVideos() {
 function openVideo(i) {
   var v = SF_VIDEOS[i];
   if (!v || (!v.youtube && !v.file)) return;
-  // YouTube's embedded player is built around a 16:9 stage: give it a 9:16 iframe
-  // and it scales to fill and crops the sides (it cut the text off the Short).
-  // So YouTube always gets 16:9 and pads vertical clips itself — nothing is lost.
-  // Self-hosted files keep a portrait stage, where <video> letterboxes safely.
-  document.getElementById('vModal').classList.toggle('portrait', !!v.portrait && !v.youtube);
+  // Vertical clips get a tall window. YouTube always renders a 16:9 canvas with the
+  // vertical video letterboxed inside it, so the CSS blows that canvas up by
+  // (16/9)² and centres it: the video itself then fills the 9:16 window exactly —
+  // full frame, nothing cropped, no empty side bars.
+  document.getElementById('vModal').classList.toggle('portrait', !!v.portrait);
   document.getElementById('vFrame').innerHTML = v.youtube
     ? '<iframe src="https://www.youtube-nocookie.com/embed/' + v.youtube + '?autoplay=1&rel=0" ' +
       'frameborder="0" allow="accelerometer; autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>'

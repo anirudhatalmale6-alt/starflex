@@ -409,8 +409,11 @@ function runCounters() {
    Each entry takes either a YouTube id OR a file under assets/video/.
    Leave both empty and the card shows a "coming soon" state instead. */
 var SF_VIDEOS = [
-  // portrait applies only when the clip is self-hosted; see openVideo.
-  { key: 'v1', youtube: 'anCl5VM4-OM', file: '', length: '', portrait: true },
+  // The first clip is a vertical Short. YouTube's embedded player crops a Short to
+  // fill whatever box it is given, so no iframe size shows the full frame — it opens
+  // on YouTube instead, where it always plays correctly. Give me the source file and
+  // it becomes a self-hosted `file:` entry that plays full-frame inside the page.
+  { key: 'v1', youtube: 'anCl5VM4-OM', file: '', length: '', portrait: true, external: true },
   { key: 'v2', youtube: 'Nzs8Fknjypc', file: '', length: '', portrait: false }
 ];
 
@@ -433,7 +436,7 @@ function renderVideos() {
           '<div class="play">▶</div>' +
           '<div class="cap">' + sfT(ready ? 'home.' + v.key : 'home.video_soon') + '</div>' +
         '</div>' +
-        (v.length ? '<span class="len">' + v.length + '</span>' : '') +
+        (v.external ? '<span class="len">YouTube ↗</span>' : (v.length ? '<span class="len">' + v.length + '</span>' : '')) +
       '</div>';
   }).join('');
 }
@@ -441,11 +444,15 @@ function renderVideos() {
 function openVideo(i) {
   var v = SF_VIDEOS[i];
   if (!v || (!v.youtube && !v.file)) return;
-  // Vertical clips get a tall window. YouTube always renders a 16:9 canvas with the
-  // vertical video letterboxed inside it, so the CSS blows that canvas up by
-  // (16/9)² and centres it: the video itself then fills the 9:16 window exactly —
-  // full frame, nothing cropped, no empty side bars.
-  document.getElementById('vModal').classList.toggle('portrait', !!v.portrait);
+
+  // Clips YouTube will not render faithfully in-page open on YouTube itself.
+  if (v.external && v.youtube) {
+    window.open('https://www.youtube.com/shorts/' + v.youtube, '_blank', 'noopener');
+    return;
+  }
+
+  // A self-hosted vertical file gets a tall window; <video> lets us control the fit.
+  document.getElementById('vModal').classList.toggle('portrait', !!v.portrait && !!v.file);
   document.getElementById('vFrame').innerHTML = v.youtube
     ? '<iframe src="https://www.youtube-nocookie.com/embed/' + v.youtube + '?autoplay=1&rel=0" ' +
       'frameborder="0" allow="accelerometer; autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>'

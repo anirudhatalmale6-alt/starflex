@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>STARFLEX — Administration du contenu</title>
+<link rel="icon" href="../assets/starflex-logo.png">
+<!--
+  ════════════════════════════════════════════════════════════════════════
+  STARFLEX CMS — for the owner's team.
+
+  Jeffery, 2 Oct 2026: "his team needs to be able to upload and manage
+  StarFlex content themselves without going through me... Their login must
+  give them ZERO access to GitHub, Render, MsouWout, HaitiBiznis, MyPlopPlop
+  or anybody else's data."
+
+  ⛔ This page talks to exactly one place: /api/cms on the StarFlex API. There
+  is no route from here to hosting, to code, or to any other platform. The
+  accounts are in their own table and their tokens are stamped for this CMS
+  alone, so a citizen of the programme cannot sign in here.
+  ════════════════════════════════════════════════════════════════════════
+-->
+<style>
+  :root{ --blue:#1c6fb0; --dark:#0d3a5c; --orange:#e8963a; --line:#e3e9f0;
+         --ink:#13293d; --muted:#5b6b7c; --bg:#f6f8fb; --ok:#1b8c5a; --bad:#c0392b; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  header{background:var(--dark);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px}
+  header img{width:30px;height:30px;border-radius:6px;background:#fff;padding:2px}
+  header .t{font-weight:800;font-size:15px}
+  header .who{margin-left:auto;font-size:12.5px;color:#bcd2e4;text-align:right}
+  header button{background:rgba(255,255,255,.14);border:0;color:#fff;border-radius:8px;
+    padding:7px 11px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;margin-left:10px}
+  main{max-width:900px;margin:0 auto;padding:16px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  h2{margin:0 0 4px;font-size:17px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 14px;line-height:1.5}
+  label{display:block;font-size:12.5px;font-weight:700;margin:12px 0 5px}
+  input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);
+    border-radius:10px;font-family:inherit;font-size:15px;background:#fff;color:var(--ink)}
+  textarea{min-height:110px;resize:vertical}
+  .row{display:flex;gap:10px}.row>*{flex:1}
+  button.go{background:var(--blue);color:#fff;border:0;border-radius:10px;padding:12px 16px;
+    font-family:inherit;font-size:15px;font-weight:800;cursor:pointer}
+  button.go.sec{background:#eef3f8;color:var(--dark)}
+  button.go.warn{background:var(--bad)}
+  button.go:disabled{opacity:.55;cursor:default}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .tabs button{flex:1;min-width:110px;background:#fff;border:1px solid var(--line);border-radius:10px;
+    padding:11px 8px;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer}
+  .tabs button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+  .msg{font-size:13.5px;margin-top:10px;line-height:1.5}
+  .msg.err{color:var(--bad)} .msg.ok{color:var(--ok)}
+  .item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}
+  .item h3{margin:0 0 2px;font-size:15px}
+  .item .meta{font-size:12px;color:var(--muted)}
+  .pill{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;
+    background:#eef3f8;color:var(--dark);margin-left:6px}
+  .pill.live{background:#e4f5ec;color:var(--ok)}
+  .pill.draft{background:#fdf0e3;color:#9a5b12}
+  .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .acts button{flex:1;min-width:92px;padding:9px;border-radius:9px;border:1px solid var(--line);
+    background:#fff;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+  .hide{display:none!important}
+  .prev{border:1px dashed var(--blue);border-radius:12px;padding:14px;background:#fbfdff;margin-top:12px}
+  .prev img{max-width:100%;border-radius:10px;margin-top:10px}
+  .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .thumbs figure{margin:0;width:88px;text-align:center}
+  .thumbs img{width:88px;height:66px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+  .thumbs figcaption{font-size:10.5px;color:var(--muted);word-break:break-all}
+  .note{background:#fbfdff;border:1px solid var(--line);border-radius:10px;padding:11px;
+    font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:12px}
+</style>
+</head>
+<body>
+
+<header>
+  <img src="../assets/starflex-logo.png" alt="STARFLEX">
+  <div>
+    <div class="t">STARFLEX</div>
+    <div style="font-size:11.5px;color:#bcd2e4">Administration du contenu</div>
+  </div>
+  <div class="who" id="who"></div>
+  <button id="out" class="hide">Quitter</button>
+</header>
+
+<main>
+
+  <!-- SIGN IN -->
+  <div class="card" id="loginCard">
+    <h2>Connexion</h2>
+    <p class="sub">Cet espace sert uniquement à gérer le contenu du site STARFLEX.</p>
+    <label for="em">Email</label>
+    <input id="em" type="email" autocomplete="username" placeholder="vous@starflexone.com">
+    <label for="pw">Mot de passe</label>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="••••••••">
+    <div style="margin-top:14px"><button class="go" id="in" style="width:100%">Se connecter</button></div>
+    <div class="msg err" id="loginErr"></div>
+  </div>
+
+  <div id="app" class="hide">
+    <div class="tabs">
+      <button data-tab="posts" class="on">Actualités &amp; événements</button>
+      <button data-tab="text">Textes du site</button>
+      <button data-tab="photos">Photos</button>
+      <button data-tab="users">Utilisateurs</button>
+      <button data-tab="account">Mon compte</button>
+    </div>
+
+    <!-- NEWS & EVENTS -->
+    <section id="tab-posts">
+      <div class="card">
+        <h2 id="pfTitle">Nouvelle publication</h2>
+        <p class="sub">Rien n'apparaît sur le site tant que vous n'avez pas publié.</p>
+        <input type="hidden" id="pId">
+        <div class="row">
+          <div>
+            <label for="pKind">Type</label>
+            <select id="pKind"><option value="news">Actualité</option><option value="event">Événement</option></select>
+          </div>
+          <div>
+            <label for="pDate">Date (événement)</label>
+            <input id="pDate" type="date">
+          </div>
+        </div>
+        <label for="pTitle">Titre</label>
+        <input id="pTitle" placeholder="Titre de l'article">
+        <label for="pPlace">Lieu (événement)</label>
+        <input id="pPlace" placeholder="Port-au-Prince">
+        <label for="pExc">Résumé</label>
+        <input id="pExc" placeholder="Une phrase qui donne envie de lire">
+        <label for="pBody">Texte</label>
+        <textarea id="pBody" placeholder="Le contenu de la publication"></textarea>
+        <label for="pImg">Photo</label>
+        <input id="pImg" type="file" accept="image/*">
+        <div class="prev" id="pPrev"></div>
+        <div class="acts">
+          <button class="go sec" id="pPreview" style="flex:1">Aperçu</button>
+          <button class="go sec" id="pDraft" style="flex:1">Enregistrer en brouillon</button>
+          <button class="go" id="pPublish" style="flex:1">Publier</button>
+        </div>
+        <button class="go sec hide" id="pCancel" style="width:100%;margin-top:8px">Annuler la modification</button>
+        <div class="msg" id="pMsg"></div>
+      </div>
+      <div id="pList"></div>
+    </section>
+
+    <!-- SITE TEXT -->
+    <section id="tab-text" class="hide">
+      <div class="card">
+        <h2>Textes du site</h2>
+        <p class="sub">Modifiez un texte, puis enregistrez. Le site le reprend immédiatement.</p>
+        <div id="bList"></div>
+        <label for="bKey">Ajouter un texte (identifiant)</label>
+        <div class="row">
+          <input id="bKey" placeholder="ex. accueil.titre">
+          <button class="go sec" id="bAdd" style="flex:0 0 auto;padding:0 18px">Ajouter</button>
+        </div>
+        <div class="msg" id="bMsg"></div>
+      </div>
+    </section>
+
+    <!-- PHOTOS -->
+    <section id="tab-photos" class="hide">
+      <div class="card">
+        <h2>Photos</h2>
+        <p class="sub">JPG, PNG, WEBP ou GIF. 3 Mo maximum par image.</p>
+        <input id="mFile" type="file" accept="image/*">
+        <div style="margin-top:12px"><button class="go" id="mUp" style="width:100%">Téléverser</button></div>
+        <div class="msg" id="mMsg"></div>
+        <div class="thumbs" id="mList"></div>
+      </div>
+    </section>
+
+    <!-- USERS -->
+    <section id="tab-users" class="hide">
+      <div class="card">
+        <h2>Utilisateurs</h2>
+        <p class="sub">Un <b>administrateur</b> peut ajouter ou retirer des personnes.
+           Un <b>éditeur</b> ne touche qu'au contenu.</p>
+        <div id="uList"></div>
+        <div id="uAddBox">
+          <label for="uEmail">Email</label><input id="uEmail" type="email">
+          <label for="uName">Nom</label><input id="uName">
+          <div class="row">
+            <div><label for="uRole">Rôle</label>
+              <select id="uRole"><option value="editor">Éditeur</option><option value="admin">Administrateur</option></select></div>
+            <div><label for="uPass">Mot de passe</label><input id="uPass" type="text" placeholder="8 caractères minimum"></div>
+          </div>
+          <div style="margin-top:12px"><button class="go" id="uAdd" style="width:100%">Ajouter la personne</button></div>
+        </div>
+        <div class="msg" id="uMsg"></div>
+        <div class="note">⛔ Ces comptes ne donnent accès qu'au contenu de STARFLEX.
+          Ils ne touchent ni au code, ni à l'hébergement, ni à aucune autre plateforme.</div>
+      </div>
+    </section>
+
+    <!-- ACCOUNT -->
+    <section id="tab-account" class="hide">
+      <div class="card">
+        <h2>Mon mot de passe</h2>
+        <label for="cOld">Mot de passe actuel</label><input id="cOld" type="password">
+        <label for="cNew">Nouveau mot de passe</label><input id="cNew" type="password" placeholder="8 caractères minimum">
+        <div style="margin-top:12px"><button class="go" id="cGo" style="width:100%">Changer</button></div>
+        <div class="msg" id="cMsg"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+var API = 'https://starflex-api.onrender.com';
+var tok = null, me = null, posts = [], blocks = [], media = [], pickedImage = null;
+
+function $(id){ return document.getElementById(id); }
+function esc(x){ return String(x==null?'':x).replace(/[&<>"']/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function say(el, text, good){ var e=$(el); e.className='msg '+(good?'ok':'err'); e.textContent=text||''; }
+
+function api(method, path, body){
+  var o = { method: method, headers: {} };
+  if (tok) o.headers['Authorization'] = 'Bearer ' + tok;
+  if (body){ o.headers['Content-Type']='application/json'; o.body = JSON.stringify(body); }
+  return fetch(API + path, o).then(function(r){
+    return r.json().catch(function(){ return {}; }).then(function(j){
+      if (!r.ok || j.success === false){
+        var e = new Error(j.message || ('Erreur ' + r.status)); e.status = r.status; throw e;
+      }
+      return j;
+    });
+  });
+}
+
+/* ─── sign in ─── */
+$('in').addEventListener('click', function(){
+  var b=this; b.disabled=true; say('loginErr','');
+  api('POST','/api/cms/login',{ email: $('em').value.trim(), password: $('pw').value })
+    .then(function(r){
+      tok = r.token; me = r.user;
+      try{ sessionStorage.setItem('sf_cms', tok); }catch(e){}
+      start();
+    })
+    .catch(function(e){ say('loginErr', e.message); })
+    .then(function(){ b.disabled=false; });
+});
+$('pw').addEventListener('keydown', function(e){ if(e.key==='Enter') $('in').click(); });
+
+$('out').addEventListener('click', function(){
+  tok=null; me=null;
+  try{ sessionStorage.removeItem('sf_cms'); }catch(e){}
+  location.reload();
+});
+
+function start(){
+  $('loginCard').classList.add('hide');
+  $('app').classList.remove('hide');
+  $('out').classList.remove('hide');
+  $('who').textContent = (me.name || me.email) + ' · ' + (me.role==='admin'?'administrateur':'éditeur');
+  /* an editor has no business seeing the user list at all */
+  document.querySelector('[data-tab="users"]').classList.toggle('hide', me.role !== 'admin');
+  loadPosts(); loadBlocks(); loadMedia();
+  if (me.role === 'admin') loadUsers();
+}
+
+/* ─── tabs ─── */
+document.querySelectorAll('.tabs button').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.tabs button').forEach(function(x){ x.classList.remove('on'); });
+    b.classList.add('on');
+    ['posts','text','photos','users','account'].forEach(function(t){
+      $('tab-'+t).classList.toggle('hide', t !== b.getAttribute('data-tab'));
+    });
+  });
+});
+
+/* ─── news & events ─── */
+function loadPosts(){
+  return api('GET','/api/cms/posts').then(function(r){ posts = r.posts||[]; drawPosts(); });
+}
+function drawPosts(){
+  $('pList').innerHTML = posts.map(function(p){
+    return '<div class="item"><h3>'+esc(p.title)
+      + '<span class="pill">'+(p.kind==='event'?'Événement':'Actualité')+'</span>'
+      + '<span class="pill '+(p.published?'live':'draft')+'">'+(p.published?'EN LIGNE':'BROUILLON')+'</span></h3>'
+      + '<div class="meta">'+esc((p.starts_at||p.created_at||'').slice(0,10))
+      + (p.location? ' · '+esc(p.location):'')+'</div>'
+      + '<div class="acts">'
+      + '<button data-ed="'+p.id+'">Modifier</button>'
+      + '<button data-pub="'+p.id+'">'+(p.published?'Retirer du site':'Publier')+'</button>'
+      + '<button data-del="'+p.id+'">Supprimer</button>'
+      + '</div></div>';
+  }).join('') || '<p class="sub">Aucune publication pour le moment.</p>';
+
+  $('pList').querySelectorAll('[data-ed]').forEach(function(b){
+    b.onclick = function(){ editPost(Number(b.getAttribute('data-ed'))); }; });
+  $('pList').querySelectorAll('[data-pub]').forEach(function(b){
+    b.onclick = function(){
+      var p = posts.find(function(x){ return x.id == b.getAttribute('data-pub'); });
+      b.disabled = true;
+      api('PATCH','/api/cms/posts/'+p.id,{ published: !p.published })
+        .then(loadPosts).catch(function(e){ say('pMsg', e.message); }); }; });
+  $('pList').querySelectorAll('[data-del]').forEach(function(b){
+    b.onclick = function(){
+      if (!confirm('Supprimer définitivement cette publication ?')) return;
+      api('DELETE','/api/cms/posts/'+b.getAttribute('data-del'))
+        .then(loadPosts).catch(function(e){ say('pMsg', e.message); }); }; });
+}
+
+function clearForm(){
+  ['pId','pTitle','pPlace','pExc','pBody','pDate'].forEach(function(i){ $(i).value=''; });
+  $('pKind').value='news'; pickedImage=null; $('pPrev').innerHTML='';
+  $('pfTitle').textContent='Nouvelle publication';
+  $('pCancel').classList.add('hide'); say('pMsg','');
+}
+function editPost(id){
+  var p = posts.find(function(x){ return x.id === id; }); if (!p) return;
+  $('pId').value=p.id; $('pKind').value=p.kind; $('pTitle').value=p.title||'';
+  $('pPlace').value=p.location||''; $('pExc').value=p.excerpt||''; $('pBody').value=p.body||'';
+  $('pDate').value = p.starts_at ? String(p.starts_at).slice(0,10) : '';
+  pickedImage = p.image_id || null;
+  $('pfTitle').textContent='Modifier la publication';
+  $('pCancel').classList.remove('hide');
+  showPreview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('pCancel').addEventListener('click', clearForm);
+
+function showPreview(){
+  var img = pickedImage ? '<img src="'+API+'/api/cms/media/'+pickedImage+'" alt="">' : '';
+  $('pPrev').innerHTML = '<b>Aperçu</b><h3 style="margin:8px 0 4px">'+esc($('pTitle').value||'(sans titre)')+'</h3>'
+    + '<div class="meta" style="color:#5b6b7c;font-size:12px">'
+    + ($('pDate').value?esc($('pDate').value):'') + ($('pPlace').value?' · '+esc($('pPlace').value):'') + '</div>'
+    + '<p style="margin:8px 0 0;font-size:14px">'+esc($('pExc').value)+'</p>'
+    + '<p style="margin:8px 0 0;font-size:13.5px;white-space:pre-wrap">'+esc($('pBody').value)+'</p>' + img;
+}
+$('pPreview').addEventListener('click', showPreview);
+
+/* the picture is uploaded first, then referenced by the publication */
+$('pImg').addEventListener('change', function(){
+  var f = this.files && this.files[0]; if (!f) return;
+  say('pMsg', "Téléversement de l'image…", true);
+  toBase64(f).then(function(d){
+    return api('POST','/api/cms/media',{ filename:f.name, mime:f.type, data:d });
+  }).then(function(r){
+    pickedImage = r.media.id; showPreview(); say('pMsg','Image ajoutée.', true); loadMedia();
+  }).catch(function(e){ say('pMsg', e.message); });
+});
+function toBase64(file){
+  return new Promise(function(res, rej){
+    var r = new FileReader();
+    r.onload = function(){ res(String(r.result)); };
+    r.onerror = function(){ rej(new Error('Lecture impossible')); };
+    r.readAsDataURL(file);
+  });
+}
+
+function savePost(publish){
+  var body = {
+    kind: $('pKind').value, title: $('pTitle').value.trim(),
+    excerpt: $('pExc').value.trim() || null, body: $('pBody').value || null,
+    location: $('pPlace').value.trim() || null,
+    starts_at: $('pDate').value || null,
+    image_id: pickedImage || null, published: !!publish
+  };
+  if (!body.title){ say('pMsg','Donnez un titre.'); return; }
+  var id = $('pId').value;
+  var p = id ? api('PATCH','/api/cms/posts/'+id, body) : api('POST','/api/cms/posts', body);
+  $('pPublish').disabled = $('pDraft').disabled = true;
+  p.then(function(){
+    say('pMsg', publish ? 'Publié sur le site.' : 'Enregistré en brouillon.', true);
+    clearForm(); return loadPosts();
+  }).catch(function(e){ say('pMsg', e.message); })
+   .then(function(){ $('pPublish').disabled = $('pDraft').disabled = false; });
+}
+$('pPublish').addEventListener('click', function(){ savePost(true); });
+$('pDraft').addEventListener('click', function(){ savePost(false); });
+
+/* ─── site text ─── */
+function loadBlocks(){
+  return api('GET','/api/cms/blocks').then(function(r){ blocks = r.blocks||[]; drawBlocks(); });
+}
+function drawBlocks(){
+  $('bList').innerHTML = blocks.map(function(b, i){
+    return '<div class="item"><div class="meta">'+esc(b.key)+'</div>'
+      + '<textarea data-bk="'+i+'">'+esc(b.value||'')+'</textarea>'
+      + '<div class="acts"><button data-bs="'+i+'">Enregistrer</button></div></div>';
+  }).join('') || '<p class="sub">Aucun texte encore. Ajoutez-en un ci-dessous.</p>';
+  $('bList').querySelectorAll('[data-bs]').forEach(function(btn){
+    btn.onclick = function(){
+      var i = Number(btn.getAttribute('data-bs'));
+      var val = $('bList').querySelector('[data-bk="'+i+'"]').value;
+      btn.disabled = true;
+      api('PUT','/api/cms/blocks/'+encodeURIComponent(blocks[i].key), { value: val })
+        .then(function(){ say('bMsg','Texte enregistré.', true); return loadBlocks(); })
+        .catch(function(e){ say('bMsg', e.message); })
+        .then(function(){ btn.disabled = false; });
+    };
+  });
+}
+$('bAdd').addEventListener('click', function(){
+  var k = $('bKey').value.trim();
+  if (!k){ say('bMsg','Donnez un identifiant.'); return; }
+  api('PUT','/api/cms/blocks/'+encodeURIComponent(k), { value: '' })
+    .then(function(){ $('bKey').value=''; say('bMsg','Ajouté.', true); return loadBlocks(); })
+    .catch(function(e){ say('bMsg', e.message); });
+});
+
+/* ─── photos ─── */
+function loadMedia(){
+  return api('GET','/api/cms/media').then(function(r){ media = r.media||[]; drawMedia(); });
+}
+function drawMedia(){
+  $('mList').innerHTML = media.map(function(m){
+    return '<figure><img src="'+API+'/api/cms/media/'+m.id+'" alt="">'
+         + '<figcaption>'+esc(m.filename||('#'+m.id))+'</figcaption></figure>';
+  }).join('') || '<p class="sub">Aucune image.</p>';
+}
+$('mUp').addEventListener('click', function(){
+  var f = $('mFile').files && $('mFile').files[0];
+  if (!f){ say('mMsg','Choisissez une image.'); return; }
+  var b = this; b.disabled = true; say('mMsg','Téléversement…', true);
+  toBase64(f).then(function(d){
+    return api('POST','/api/cms/media',{ filename:f.name, mime:f.type, data:d });
+  }).then(function(){ say('mMsg','Image ajoutée.', true); $('mFile').value=''; return loadMedia(); })
+   .catch(function(e){ say('mMsg', e.message); })
+   .then(function(){ b.disabled = false; });
+});
+
+/* ─── users ─── */
+function loadUsers(){
+  return api('GET','/api/cms/users').then(function(r){
+    $('uList').innerHTML = (r.users||[]).map(function(u){
+      return '<div class="item"><h3>'+esc(u.name||u.email)
+        + '<span class="pill">'+(u.role==='admin'?'Administrateur':'Éditeur')+'</span>'
+        + (u.status==='disabled'?'<span class="pill draft">DÉSACTIVÉ</span>':'')+'</h3>'
+        + '<div class="meta">'+esc(u.email)+'</div>'
+        + '<div class="acts">'
+        + '<button data-ur="'+u.id+'" data-role="'+(u.role==='admin'?'editor':'admin')+'">'
+        + (u.role==='admin'?'Passer éditeur':'Passer administrateur')+'</button>'
+        + '<button data-us="'+u.id+'" data-st="'+(u.status==='disabled'?'active':'disabled')+'">'
+        + (u.status==='disabled'?'Réactiver':'Désactiver')+'</button>'
+        + '</div></div>';
+    }).join('');
+    $('uList').querySelectorAll('[data-ur]').forEach(function(b){
+      b.onclick = function(){
+        api('PATCH','/api/cms/users/'+b.getAttribute('data-ur'),{ role: b.getAttribute('data-role') })
+          .then(loadUsers).then(function(){ say('uMsg','Rôle modifié.', true); })
+          .catch(function(e){ say('uMsg', e.message); }); }; });
+    $('uList').querySelectorAll('[data-us]').forEach(function(b){
+      b.onclick = function(){
+        api('PATCH','/api/cms/users/'+b.getAttribute('data-us'),{ status: b.getAttribute('data-st') })
+          .then(loadUsers).then(function(){ say('uMsg','Compte modifié.', true); })
+          .catch(function(e){ say('uMsg', e.message); }); }; });
+  });
+}
+$('uAdd').addEventListener('click', function(){
+  var b=this; b.disabled=true;
+  api('POST','/api/cms/users',{ email:$('uEmail').value.trim(), name:$('uName').value.trim(),
+                                role:$('uRole').value, password:$('uPass').value })
+    .then(function(){
+      say('uMsg','Personne ajoutée. Communiquez-lui son mot de passe, elle pourra le changer.', true);
+      $('uEmail').value=$('uName').value=$('uPass').value='';
+      return loadUsers();
+    })
+    .catch(function(e){ say('uMsg', e.message); })
+    .then(function(){ b.disabled=false; });
+});
+
+/* ─── my password ─── */
+$('cGo').addEventListener('click', function(){
+  var b=this; b.disabled=true;
+  api('POST','/api/cms/change-password',{ current:$('cOld').value, next:$('cNew').value })
+    .then(function(){ say('cMsg','Mot de passe changé.', true); $('cOld').value=$('cNew').value=''; })
+    .catch(function(e){ say('cMsg', e.message); })
+    .then(function(){ b.disabled=false; });
+});
+
+/* already signed in this session? */
+(function(){
+  var t = null;
+  try { t = sessionStorage.getItem('sf_cms'); } catch(e){}
+  if (!t) return;
+  tok = t;
+  api('GET','/api/cms/me').then(function(r){ me = r.user; start(); })
+    .catch(function(){ tok=null; try{ sessionStorage.removeItem('sf_cms'); }catch(e){} });
+})();
+</script>
+</body>
+</html>

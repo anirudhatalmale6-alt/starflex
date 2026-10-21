@@ -147,7 +147,7 @@ document.getElementById('regForm').addEventListener('submit', function (e) {
       var d = res.data || {};
       // The verification screen needs to know who is verifying and on which channel.
       sessionStorage.setItem('sf_pending', JSON.stringify({
-        citizen_id: d.citizen_id, channel: d.channel, otp: d.otp || null,
+        citizen_id: d.citizen_id, ticket: d.ticket || null, channel: d.channel, otp: d.otp || null,
         contact: payload.email || payload.phone
       }));
       location.href = 'verify.html';

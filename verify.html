@@ -136,7 +136,9 @@ document.getElementById('otpForm').addEventListener('submit', function (e) {
   sfMsg('msg', '');
   sfBusy(btn, true, sfT('msg.verifying'));
 
-  sfApi('/api/auth/verify-otp', { method: 'POST', body: { citizen_id: pending.citizen_id, code: code } })
+  /* 🔒 The ticket from register/login proves this is the person who asked for
+     the code. The server no longer accepts the account number alone. */
+  sfApi('/api/auth/verify-otp', { method: 'POST', body: { citizen_id: pending.citizen_id, ticket: pending.ticket, code: code } })
     .then(function (res) {
       sfSetSession(res.token, res.data);
       sessionStorage.removeItem('sf_pending');
@@ -144,6 +146,7 @@ document.getElementById('otpForm').addEventListener('submit', function (e) {
     })
     .catch(function (err) {
       sfBusy(btn, false);
+      if (backToLogin(err)) return;
       sfMsg('msg', err.message);
       boxes.forEach(function (b) { b.value = ''; });
       boxes[0].focus();
@@ -153,13 +156,24 @@ document.getElementById('otpForm').addEventListener('submit', function (e) {
 document.getElementById('resendLink').addEventListener('click', function (e) {
   e.preventDefault();
   sfMsg('msg', '');
-  sfApi('/api/auth/resend-otp', { method: 'POST', body: { citizen_id: pending.citizen_id } })
+  sfApi('/api/auth/resend-otp', { method: 'POST', body: { citizen_id: pending.citizen_id, ticket: pending.ticket } })
     .then(function (res) {
       sfMsg('msg', sfT('msg.otp_resent'), 'ok');
       showDemoCode((res.data || {}).otp);
     })
-    .catch(function (err) { sfMsg('msg', err.message); });
+    .catch(function (err) { if (!backToLogin(err)) sfMsg('msg', err.message); });
 });
+
+/* An expired verification session, or an account that is already verified,
+   goes back to the sign-in page instead of a dead end. */
+function backToLogin(err) {
+  var c = (err.data || {}).code;
+  if (c !== 'ticket_required' && c !== 'already_verified') return false;
+  sessionStorage.removeItem('sf_pending');
+  sfMsg('msg', err.message);
+  setTimeout(function () { location.href = 'login.html'; }, 2500);
+  return true;
+}
 </script>
 
 <footer class="site-footer">

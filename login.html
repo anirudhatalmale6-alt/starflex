@@ -110,7 +110,7 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
       var d = (err.data || {});
       if (d.code === 'verification_required' && d.data) {
         sessionStorage.setItem('sf_pending', JSON.stringify({
-          citizen_id: d.data.citizen_id, channel: d.data.channel, otp: d.data.otp || null,
+          citizen_id: d.data.citizen_id, ticket: d.data.ticket || null, channel: d.data.channel, otp: d.data.otp || null,
           contact: document.getElementById('identifier').value.trim()
         }));
         location.href = 'verify.html';

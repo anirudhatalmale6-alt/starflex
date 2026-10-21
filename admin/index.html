@@ -150,9 +150,12 @@
     <section id="tab-text" class="hide">
       <div class="card">
         <h2>Textes du site</h2>
-        <p class="sub">Modifiez un texte, puis enregistrez. Le site le reprend immédiatement.</p>
+        <p class="sub">Cherchez une phrase du site par ses mots, cliquez « Modifier », écrivez le nouveau texte et enregistrez. Le site affiche le changement dans les 2 minutes. Pour la version en kreyòl, utilisez « Version kreyòl ».</p>
+        <label for="bSearch">Chercher un texte du site</label>
+        <input id="bSearch" placeholder="ex. Lancement du projet pilote" autocomplete="off">
+        <div id="bFound"></div>
         <div id="bList"></div>
-        <label for="bKey">Ajouter un texte (identifiant)</label>
+        <label for="bKey">Ajouter un texte par son identifiant (avancé)</label>
         <div class="row">
           <input id="bKey" placeholder="ex. accueil.titre">
           <button class="go sec" id="bAdd" style="flex:0 0 auto;padding:0 18px">Ajouter</button>
@@ -209,6 +212,7 @@
   </div>
 </main>
 
+<script src="../assets/starflex-i18n.js"></script>
 <script>
 var API = 'https://starflex-api.onrender.com';
 var tok = null, me = null, posts = [], blocks = [], media = [], pickedImage = null;
@@ -380,9 +384,51 @@ $('pDraft').addEventListener('click', function(){ savePost(false); });
 function loadBlocks(){
   return api('GET','/api/cms/blocks').then(function(r){ blocks = r.blocks||[]; drawBlocks(); });
 }
+/* The site's own sentences, from the same dictionary the language switcher
+   uses, so a text can be found by its words instead of by an identifier. */
+function siteText(key, l){
+  if (typeof SF_I18N === 'undefined') return '';
+  var d = SF_I18N[l||'fr'] || {};
+  return String(d[key]==null ? '' : d[key]).replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&');
+}
+function blockLabel(key){
+  var m = key.match(/^(.+)@ht$/);
+  var base = m ? m[1] : key;
+  var t = siteText(base, m ? 'ht' : 'fr');
+  return (m ? 'KREYÒL — ' : 'FRANÇAIS — ') + (t ? 'texte d\'origine : « ' + t.slice(0,90) + (t.length>90?'…':'') + ' »' : base);
+}
+function openBlock(key, initial){
+  var i = blocks.findIndex(function(b){ return b.key === key; });
+  if (i >= 0) { focusBlock(key); return Promise.resolve(); }
+  return api('PUT','/api/cms/blocks/'+encodeURIComponent(key), { value: initial||'' })
+    .then(loadBlocks).then(function(){ focusBlock(key); });
+}
+function focusBlock(key){
+  var i = blocks.findIndex(function(b){ return b.key === key; });
+  var t = $('bList').querySelector('[data-bk="'+i+'"]');
+  if (t) { t.scrollIntoView({behavior:'smooth', block:'center'}); t.focus(); }
+}
+$('bSearch').addEventListener('input', function(){
+  var q = this.value.trim().toLowerCase();
+  if (q.length < 3 || typeof SF_I18N === 'undefined') { $('bFound').innerHTML = ''; return; }
+  var hits = Object.keys(SF_I18N.fr).filter(function(k){
+    return siteText(k,'fr').toLowerCase().indexOf(q) !== -1 || siteText(k,'ht').toLowerCase().indexOf(q) !== -1;
+  }).slice(0, 12);
+  $('bFound').innerHTML = hits.map(function(k){
+    return '<div class="item"><div>'+esc(siteText(k,'fr'))+'</div>'
+      + '<div class="meta">KR : '+esc(siteText(k,'ht')||'—')+'</div>'
+      + '<div class="acts"><button data-fr="'+esc(k)+'">Modifier</button> <button data-ht="'+esc(k)+'">Version kreyòl</button></div></div>';
+  }).join('') || '<p class="sub">Aucune phrase trouvée.</p>';
+  $('bFound').querySelectorAll('[data-fr]').forEach(function(b){
+    b.onclick = function(){ var k=b.getAttribute('data-fr'); openBlock(k, siteText(k,'fr')).catch(function(e){ say('bMsg', e.message); }); };
+  });
+  $('bFound').querySelectorAll('[data-ht]').forEach(function(b){
+    b.onclick = function(){ var k=b.getAttribute('data-ht'); openBlock(k+'@ht', siteText(k,'ht')).catch(function(e){ say('bMsg', e.message); }); };
+  });
+});
 function drawBlocks(){
   $('bList').innerHTML = blocks.map(function(b, i){
-    return '<div class="item"><div class="meta">'+esc(b.key)+'</div>'
+    return '<div class="item"><div class="meta">'+esc(blockLabel(b.key))+'</div>'
       + '<textarea data-bk="'+i+'">'+esc(b.value||'')+'</textarea>'
       + '<div class="acts"><button data-bs="'+i+'">Enregistrer</button></div></div>';
   }).join('') || '<p class="sub">Aucun texte encore. Ajoutez-en un ci-dessous.</p>';

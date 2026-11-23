@@ -101,10 +101,16 @@
   </div>
 
   <div id="app" class="hide">
+    <div class="card hide" id="newBanner" style="border-color:var(--orange);background:#fff8f0;cursor:pointer;padding:13px 16px">
+      <b>🔔 <span id="newBannerN">0</span> nouvelle(s) inscription(s)</b> depuis votre dernière visite — <u>voir la liste</u>
+    </div>
     <div class="tabs">
       <button data-tab="posts" class="on">Actualités &amp; événements</button>
       <button data-tab="text">Textes du site</button>
       <button data-tab="photos">Photos</button>
+      <button data-tab="cit" class="adm hide">Citoyens <span id="citBadge" class="pill hide" style="background:var(--orange);color:#fff">0</span></button>
+      <button data-tab="crs" class="adm hide">Formations</button>
+      <button data-tab="crt" class="adm hide">Certificats</button>
       <button data-tab="users">Utilisateurs</button>
       <button data-tab="account">Mon compte</button>
     </div>
@@ -178,6 +184,36 @@
     </section>
 
     <!-- USERS -->
+    <!-- 23 Nov 2026: citizens · courses · certificates (administrateur seulement, lecture seule) -->
+    <section id="tab-cit" class="hide">
+      <div class="card">
+        <h2>Citoyens inscrits</h2>
+        <p class="sub" id="citSum">…</p>
+        <div class="row"><input id="citQ" placeholder="Chercher : nom, téléphone, email, commune"><button class="go sec" id="citGo" style="flex:0 0 auto">Chercher</button></div>
+        <div class="acts"><button id="citCsv">⬇ Télécharger la liste (Excel)</button></div>
+        <div class="msg" id="citMsg"></div>
+        <div id="citList" style="margin-top:12px"></div>
+        <div class="acts" id="citPager"></div>
+      </div>
+    </section>
+    <section id="tab-crs" class="hide">
+      <div class="card">
+        <h2>Formations</h2>
+        <p class="sub">Qui a commencé, qui a terminé. « Terminé » = tous les modules publiés suivis.</p>
+        <div id="crsSum"></div>
+        <div class="msg" id="crsMsg"></div>
+        <div id="crsList" style="margin-top:12px"></div>
+      </div>
+    </section>
+    <section id="tab-crt" class="hide">
+      <div class="card">
+        <h2>Certificats délivrés</h2>
+        <p class="sub" id="crtSum">…</p>
+        <div class="acts"><button id="crtCsv">⬇ Télécharger la liste (Excel)</button></div>
+        <div class="msg" id="crtMsg"></div>
+        <div id="crtList" style="margin-top:12px"></div>
+      </div>
+    </section>
     <section id="tab-users" class="hide">
       <div class="card">
         <h2>Utilisateurs</h2>
@@ -266,6 +302,102 @@ function start(){
   document.querySelector('[data-tab="users"]').classList.toggle('hide', me.role !== 'admin');
   loadPosts(); loadBlocks(); loadMedia();
   if (me.role === 'admin') loadUsers();
+  document.querySelectorAll('.tabs .adm').forEach(function(x){ x.classList.toggle('hide', me.role !== 'admin'); });
+  if (me.role === 'admin') loadCitSummary();
+}
+
+/* ─── citizens · courses · certificates (23 Nov 2026, admin only) ─── */
+function fmtD(x){ if(!x) return ''; var d=new Date(x); return d.toLocaleDateString('fr-FR')+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); }
+var LVL = { bronze:'Bronze', argent:'Argent', or:'Or' };
+function loadCitSummary(){
+  return api('GET','/api/cms/citizens/summary').then(function(r){
+    var n = r.unseen||0;
+    $('citBadge').textContent = n; $('citBadge').classList.toggle('hide', !n);
+    $('newBannerN').textContent = n; $('newBanner').classList.toggle('hide', !n);
+    $('citSum').textContent = r.total+' inscrit(s) · '+r.verified+' vérifié(s) · '+r.last24h+' dernières 24 h · '+r.last7d+' derniers 7 jours';
+    return r;
+  }).catch(function(){});
+}
+$('newBanner').addEventListener('click', function(){ document.querySelector('[data-tab="cit"]').click(); });
+var citPage = 1;
+function openCitizens(){
+  citPage = 1;
+  loadCitizens().then(function(){
+    /* opened = seen: the bell resets, the NOUVEAU marks stay on screen until the next visit */
+    api('POST','/api/cms/citizens/seen',{}).then(function(){ $('citBadge').classList.add('hide'); $('newBanner').classList.add('hide'); }).catch(function(){});
+  });
+}
+function loadCitizens(){
+  say('citMsg','');
+  loadCitSummary();
+  return api('GET','/api/cms/citizens?page='+citPage+'&q='+encodeURIComponent($('citQ').value.trim())).then(function(r){
+    var L = r.citizens||[];
+    $('citList').innerHTML = L.length ? L.map(function(c){
+      return '<div class="item"><h3>'+esc(c.full_name)
+        + (c.isNew?'<span class="pill" style="background:var(--orange);color:#fff">NOUVEAU</span>':'')
+        + (c.verified?'<span class="pill live">vérifié</span>':'<span class="pill draft">non vérifié</span>')
+        + (c.cert_code && !c.cert_revoked?'<span class="pill">🏅 '+esc(LVL[c.cert_level]||c.cert_level)+'</span>':'')+'</h3>'
+        + '<div class="meta">'+esc([c.phone,c.email].filter(Boolean).join(' · '))+'</div>'
+        + '<div class="meta">'+esc([c.commune,c.department].filter(Boolean).join(', ')||'—')+' · inscrit le '+esc(fmtD(c.created_at))
+        + ' · '+c.modules_done+' module(s) · '+c.points+' pts'+(c.status!=='active'?' · '+esc(c.status):'')+'</div></div>';
+    }).join('') : '<p class="sub">Aucun citoyen'+($('citQ').value.trim()?' pour cette recherche':'')+'.</p>';
+    var pg = '';
+    if (r.pages > 1){
+      if (r.page > 1) pg += '<button data-pg="'+(r.page-1)+'">← Précédent</button>';
+      pg += '<button disabled>Page '+r.page+' / '+r.pages+' ('+r.total+')</button>';
+      if (r.page < r.pages) pg += '<button data-pg="'+(r.page+1)+'">Suivant →</button>';
+    }
+    $('citPager').innerHTML = pg;
+    $('citPager').querySelectorAll('[data-pg]').forEach(function(b){ b.onclick=function(){ citPage=+b.getAttribute('data-pg'); loadCitizens(); window.scrollTo(0,0); }; });
+  }).catch(function(e){ say('citMsg', e.message); });
+}
+$('citGo').addEventListener('click', function(){ citPage=1; loadCitizens(); });
+$('citQ').addEventListener('keydown', function(e){ if(e.key==='Enter'){ citPage=1; loadCitizens(); } });
+/* the CSV needs the login token, so it is fetched, not linked */
+function dlCsv(path, name, msgEl){
+  say(msgEl,'Préparation…',true);
+  fetch(API+path,{ headers:{ Authorization:'Bearer '+tok } }).then(function(r){
+    if(!r.ok) throw new Error('Erreur '+r.status); return r.blob();
+  }).then(function(bl){
+    var u=URL.createObjectURL(bl), a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(u); }, 30000); say(msgEl,'Fichier téléchargé.',true);
+  }).catch(function(e){ say(msgEl, e.message); });
+}
+$('citCsv').addEventListener('click', function(){ dlCsv('/api/cms/citizens.csv?q='+encodeURIComponent($('citQ').value.trim()),'starflex-citoyens.csv','citMsg'); });
+$('crtCsv').addEventListener('click', function(){ dlCsv('/api/cms/certificates?format=csv','starflex-certificats.csv','crtMsg'); });
+function loadCourses(){
+  say('crsMsg','');
+  return api('GET','/api/cms/courses').then(function(r){
+    $('crsSum').innerHTML = '<div class="row" style="flex-wrap:wrap">'
+      + [['Inscrits',r.citizens],['Pas commencé',r.not_started],['En cours',r.in_progress],['Terminé',r.finished]].map(function(x){
+          return '<div class="item" style="text-align:center;min-width:120px"><div style="font-size:24px;font-weight:800;color:var(--dark)">'+x[1]+'</div><div class="meta">'+x[0]+'</div></div>'; }).join('')
+      + '</div>';
+    $('crsList').innerHTML = (r.modules||[]).map(function(m){
+      return '<div class="item"><h3>'+esc(m.title)+'<span class="pill '+(m.published?'live':'draft')+'">'+(m.published?'PUBLIÉ':'MASQUÉ')+'</span></h3>'
+        + '<div class="meta">'+m.completed+' citoyen(s) ont terminé ce module</div>'
+        + (m.completed?'<div class="acts"><button data-mod="'+m.id+'">Voir qui</button></div><div id="mod'+m.id+'"></div>':'')+'</div>';
+    }).join('') || '<p class="sub">Aucun module.</p>';
+    $('crsList').querySelectorAll('[data-mod]').forEach(function(b){ b.onclick=function(){
+      var id=b.getAttribute('data-mod'); b.disabled=true;
+      api('GET','/api/cms/courses/'+id+'/completions').then(function(x){
+        $('mod'+id).innerHTML = (x.completions||[]).map(function(c){ return '<div class="meta" style="padding:4px 0;border-top:1px solid var(--line)">'
+          + esc(c.full_name)+' · '+esc(c.phone||c.email||'')+' · '+esc(fmtD(c.completed_at))+'</div>'; }).join('');
+      }).catch(function(e){ say('crsMsg', e.message); b.disabled=false; });
+    }; });
+  }).catch(function(e){ say('crsMsg', e.message); });
+}
+function loadCerts(){
+  say('crtMsg','');
+  return api('GET','/api/cms/certificates').then(function(r){
+    var lv = Object.keys(r.byLevel||{}).map(function(k){ return (LVL[k]||k)+' '+r.byLevel[k]; }).join(' · ');
+    $('crtSum').textContent = r.total+' certificat(s) valide(s)'+(lv?' — '+lv:'');
+    $('crtList').innerHTML = (r.certificates||[]).map(function(c){
+      return '<div class="item"><h3>'+esc(c.full_name)+'<span class="pill">🏅 '+esc(LVL[c.level]||c.level)+'</span>'
+        + (c.revoked_at?'<span class="pill draft">RÉVOQUÉ</span>':'')+'</h3>'
+        + '<div class="meta">Code <b>'+esc(c.code)+'</b> · délivré le '+esc(fmtD(c.issued_at))+' · '+c.points_at_issue+' pts</div>'
+        + '<div class="meta">'+esc([c.phone,c.email,c.commune].filter(Boolean).join(' · '))+'</div></div>';
+    }).join('') || '<p class="sub">Aucun certificat délivré pour l\'instant.</p>';
+  }).catch(function(e){ say('crtMsg', e.message); });
 }
 
 /* ─── tabs ─── */
@@ -273,9 +405,11 @@ document.querySelectorAll('.tabs button').forEach(function(b){
   b.addEventListener('click', function(){
     document.querySelectorAll('.tabs button').forEach(function(x){ x.classList.remove('on'); });
     b.classList.add('on');
-    ['posts','text','photos','users','account'].forEach(function(t){
+    ['posts','text','photos','cit','crs','crt','users','account'].forEach(function(t){
       $('tab-'+t).classList.toggle('hide', t !== b.getAttribute('data-tab'));
     });
+    var t = b.getAttribute('data-tab');
+    if (t === 'cit') openCitizens(); if (t === 'crs') loadCourses(); if (t === 'crt') loadCerts();
   });
 });
 
